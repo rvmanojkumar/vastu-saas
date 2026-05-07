@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 30px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .logo {
+            height: 80px;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .good { color: green; }
+        .bad { color: red; }
+        .neutral { color: orange; }
+
+        .watermark {
+            position: fixed;
+            opacity: 0.1;
+            font-size: 60px;
+            transform: rotate(-45deg);
+            top: 40%;
+            left: 20%;
+        }
+    </style>
+</head>
+
+<body>
+
+{% if watermark %}
+<div class="watermark">{{ watermark }}</div>
+{% endif %}
+
+<div class="header">
+    {% if logo %}
+        <img src="{{ logo }}" class="logo"/>
+    {% endif %}
+    <h2>{{ company_name }}</h2>
+    <p>{{ phone }} | {{ email }}</p>
+</div>
+
+<hr/>
+
+<h3>Project: {{ project_name }}</h3>
+
+<div class="section">
+    <h3>Rooms Analysis</h3>
+    {% for room in rooms %}
+        <p>
+            <b>{{ room.name }}</b> -
+            {{ room.direction_16 }} /
+            {{ room.direction_32 }}
+            <span class="{{ room.result }}">{{ room.result }}</span>
+        </p>
+        <p>{{ room.description }}</p>
+    {% endfor %}
+</div>
+
+<div class="section">
+    <h3>Objects Analysis</h3>
+    {% for obj in objects %}
+        <p>
+            <b>{{ obj.name }}</b> -
+            {{ obj.direction_16 }}
+            <span class="{{ obj.result }}">{{ obj.result }}</span>
+        </p>
+    {% endfor %}
+</div>
+
+<div class="section">
+    <h3>User Notes</h3>
+    <p>{{ notes }}</p>
+</div>
+
+</body>
+</html>
