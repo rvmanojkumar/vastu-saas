@@ -102,14 +102,6 @@ def seed():
             "code": "en",
             "name": "English",
             "is_default": True
-        },
-        {
-            "code": "ml",
-            "name": "Malayalam"
-        },
-        {
-            "code": "hi",
-            "name": "Hindi"
         }
     ]
 
