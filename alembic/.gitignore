@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Env
+venv/
+env/
+
+# Environment
+.env
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Uploads
+uploads/
+media/
+generated_reports/
+
+# Logs
+*.log
+logs/
+
+# Mac
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Build
+dist/
+build/
