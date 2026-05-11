@@ -1,4 +1,4 @@
-# app/api/subscription_api.py
+# app/api/subscription.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
