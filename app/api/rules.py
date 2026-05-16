@@ -21,7 +21,7 @@ def get_criticality(
     entity_type: str,  # room or object
     entity_name: str,  # Bedroom, Kitchen, Bed, Stove
     direction_value: str,  # NE, SW, N, S, etc.
-    direction_system: str = Query("16", regex="^(16|32|CENTER)$"),
+    direction_system: str = Query("16", pattern="^(16|32|CENTER)$"),
     language_code: Optional[str] = "en",
     db: Session = Depends(get_db)
 ):

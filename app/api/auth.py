@@ -8,8 +8,14 @@ from app.db.session import SessionLocal
 from app.models.user import User
 from app.models.subscription import Subscription
 from app.core.security import (
-    get_password_hash, authenticate_user, create_access_token,
-    create_refresh_token, get_current_user
+    hash_password as get_password_hash,
+    create_refresh_token, get_current_user,
+    verify_password,
+    authenticate_user,
+    create_access_token,
+    create_refresh_token,
+    get_current_user
+
 )
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

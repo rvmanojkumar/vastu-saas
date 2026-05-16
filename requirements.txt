@@ -74,3 +74,4 @@ weasyprint==62.3
 webencodings==0.5.1
 zipp==3.23.1
 zopfli==0.2.3.post1
+email_validator==2.1.0

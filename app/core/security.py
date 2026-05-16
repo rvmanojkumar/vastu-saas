@@ -13,7 +13,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production-use-environment-variable")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is not set!")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -50,6 +52,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    if "sub" in to_encode and isinstance(to_encode["sub"], int):
+        to_encode["sub"] = str(to_encode["sub"])
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -78,6 +82,8 @@ async def get_current_user(
 ):
     """Get current user from JWT token"""
     token = credentials.credentials
+    print(f"Token received: {token[:50]}...")
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -85,20 +91,43 @@ async def get_current_user(
     )
     
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # Decode with verification
+        payload = jwt.decode(
+            token, 
+            SECRET_KEY, 
+            algorithms=[ALGORITHM],
+            options={"verify_signature": True}
+        )
         user_id: int = payload.get("sub")
         token_type: str = payload.get("type")
         
+        print(f"Decoded user_id: {user_id}")
+        print(f"Token type: {token_type}")
+        
         if user_id is None or token_type != "access":
+            print("Invalid token: missing user_id or wrong type")
             raise credentials_exception
         
-    except JWTError:
+    except jwt.ExpiredSignatureError:
+        print("Token has expired")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except JWTError as e:  # ✅ Fixed: Use JWTError instead of InvalidTokenError
+        print(f"JWT error: {str(e)}")
+        raise credentials_exception
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
         raise credentials_exception
     
     user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
     if user is None:
+        print(f"User not found or inactive: {user_id}")
         raise credentials_exception
     
+    print(f"User authenticated: {user.email}")
     return user
 
 async def get_current_admin(current_user: User = Depends(get_current_user)):

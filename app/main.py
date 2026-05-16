@@ -1,4 +1,15 @@
+import logging
+import sys
 from fastapi import FastAPI
+# Configure logging once here
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('logs/app.log')
+    ]
+)
 from app.api.room import router as room_router
 from app.api.object import router as object_router
 from app.api.rules import router as rule_router
@@ -13,6 +24,10 @@ from app.api.ws import router as ws_router
 from fastapi.staticfiles import StaticFiles
 from app.api.payment import router as payment_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.admin import router as admin_router
+from app.api.floorplan import router as floorplan_router
+import os
+os.makedirs("logs", exist_ok=True)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -30,8 +45,10 @@ app.include_router(payment_router)
 app.include_router(object_router)
 app.include_router(project_router)
 app.include_router(report_router)
+app.include_router(admin_router)  # ADD THIS - Admin management
 app.include_router(ws_router)
 app.include_router(tasks_router)
+app.include_router(floorplan_router)
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
 @app.get("/")
@@ -43,6 +60,6 @@ def root():
             "auth": "/auth",
             "subscriptions": "/api/subscriptions",
             "projects": "/projects",
-            "reports": "/reports"
+            "reports": "/reports",
         }
     }
