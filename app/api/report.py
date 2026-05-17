@@ -13,6 +13,8 @@ from app.core.security import get_current_user
 from app.services.subscription import check_subscription
 from app.tasks.report_tasks import generate_report_task
 import logging
+from fastapi.responses import FileResponse  # Add this import
+import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -180,7 +182,7 @@ def generate_report(
         raise HTTPException(status_code=500, detail="Failed to create report task")
     
     # Prepare data for Celery task
-    report_data = request.dict(exclude_none=True)
+    report_data = request.model_dump(exclude_none=True)
     report_data["project_name"] = project.name
     report_data["user_id"] = current_user.id
     report_data["user_email"] = current_user.email
@@ -215,6 +217,7 @@ def generate_report(
 # ============================================================
 
 @router.get("/task/{task_id}", response_model=TaskStatusResponse)
+@router.get("/task/{task_id}")
 def get_task_status(
     task_id: str,
     db: Session = Depends(get_db),
@@ -238,15 +241,26 @@ def get_task_status(
         if not is_admin:
             raise HTTPException(status_code=403, detail="Not authorized to view this task")
     
-    return TaskStatusResponse(
-        task_id=task.task_id,
-        status=task.status,
-        progress=task.progress,
-        result_path=task.result_path,
-        error=task.error,
-        created_at=task.created_at.isoformat() if task.created_at else None,
-        updated_at=task.updated_at.isoformat() if task.updated_at else None
-    )
+    # Prepare response
+    response = {
+        "task_id": task.task_id,
+        "status": task.status,
+        "progress": task.progress,
+        "result_path": task.result_path,
+        "error": task.error,
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+        "updated_at": task.updated_at.isoformat() if task.updated_at else None
+    }
+    
+    # 🔥 ADD THIS: If task is completed, find report and add download URL
+    if task.status == "COMPLETED" and task.result_path:
+        from app.models.report import Report
+        report = db.query(Report).filter(Report.pdf_path == task.result_path).first()
+        if report:
+            response["download_url"] = f"/reports/download/{report.id}"
+            response["report_id"] = report.id
+    
+    return response
 
 # ============================================================
 # LIST PROJECT REPORTS
@@ -301,8 +315,6 @@ def get_project_reports(
 # DOWNLOAD REPORT
 # ============================================================
 
-from fastapi.responses import FileResponse
-
 @router.get("/download/{report_id}")
 def download_report(
     report_id: int,
@@ -313,6 +325,7 @@ def download_report(
     
     from app.models.report import Report
     
+    # Get report
     report = db.query(Report).filter(Report.id == report_id).first()
     
     if not report:
@@ -327,11 +340,16 @@ def download_report(
     if not project:
         raise HTTPException(status_code=403, detail="Not authorized to download this report")
     
+    # Check if file exists
     if not os.path.exists(report.pdf_path):
         raise HTTPException(status_code=404, detail="Report file not found")
     
+    # Return file for download
     return FileResponse(
         path=report.pdf_path,
         filename=f"vastu_report_project_{report.project_id}.pdf",
-        media_type="application/pdf"
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=vastu_report_project_{report.project_id}.pdf"
+        }
     )

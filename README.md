@@ -51,3 +51,13 @@ How do I provide the existing code so that we can start where it stopped?
 pip install passlib bcrypt python-jose python-multipart
 alembic revision --autogenerate -m "add_role_column_to_users"
 alembic upgrade head
+
+sudo apt update
+
+sudo apt install -y \
+libpango-1.0-0 \
+libpangoft2-1.0-0 \
+libpangocairo-1.0-0 \
+libcairo2 \
+libffi-dev \
+shared-mime-info

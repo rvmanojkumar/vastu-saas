@@ -1,86 +1,364 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        body {
-            font-family: Arial;
-            margin: 30px;
-        }
+<meta charset="UTF-8">
+<title>{{ report_title or "SPIRITUALHUT - Vastu Report" }}</title>
 
-        .header {
-            text-align: center;
-        }
+<style>
 
-        .logo {
-            height: 80px;
-        }
+@page{
+    size:A4;
+    margin:18mm;
+}
 
-        .section {
-            margin-top: 20px;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f6f1ea;
+    color:#2b2b2b;
+    margin:0;
+    padding:0;
+    font-size:12px;
+    line-height:1.6;
+}
 
-        .good { color: green; }
-        .bad { color: red; }
-        .neutral { color: orange; }
+/* WATERMARK */
+.watermark{
+    position:fixed;
+    top:40%;
+    left:5%;
+    transform:rotate(-30deg);
+    font-size:72px;
+    font-weight:bold;
+    color:#000;
+    opacity:0.04;
+    z-index:-1;
+    white-space:nowrap;
+}
 
-        .watermark {
-            position: fixed;
-            opacity: 0.1;
-            font-size: 60px;
-            transform: rotate(-45deg);
-            top: 40%;
-            left: 20%;
-        }
-    </style>
+/* CONTAINER */
+.container{ width:100%; }
+
+/* HEADER */
+.header{
+    background:#5b3a22;
+    color:white;
+    border-radius:18px;
+    padding:30px;
+    margin-bottom:25px;
+    border:1px solid #4b2e19;
+}
+
+.header-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.header-left{ width:60%; vertical-align:top; }
+.header-right{ width:40%; vertical-align:top; text-align:right; }
+
+.logo img{
+    width:90px;
+    border-radius:10px;
+    border:2px solid rgba(255,255,255,0.2);
+}
+
+.brand-title{
+    font-size:38px;
+    font-weight:bold;
+    margin-bottom:8px;
+    letter-spacing:1px;
+}
+
+.brand-subtitle{ font-size:14px; opacity:0.95; }
+.consultant-name{ font-size:24px; font-weight:bold; }
+
+/* CARD */
+.card{
+    background:white;
+    border:1px solid #e3d9cd;
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:24px;
+}
+
+.card-title{
+    font-size:22px;
+    font-weight:bold;
+    color:#5b3a22;
+    margin-bottom:18px;
+    border-bottom:2px solid #efe5d8;
+    padding-bottom:10px;
+}
+
+/* INFO BOX */
+.info-box{
+    background:#faf6f0;
+    border:1px solid #eadfce;
+    border-left:6px solid #c58634;
+    border-radius:12px;
+    padding:16px;
+}
+
+.info-box h4{
+    margin:0 0 10px 0;
+    font-size:15px;
+    color:#5b3a22;
+}
+
+.good{ border-left-color:#2d9b5f; }
+.warning{ border-left-color:#d89a2d; }
+.bad{ border-left-color:#d64b4b; }
+
+/* SCORE */
+.score-card{
+    margin-top:20px;
+    background:#fff7e8;
+    border:1px solid #edd8aa;
+    border-radius:16px;
+    text-align:center;
+    padding:30px;
+}
+
+.score{
+    font-size:64px;
+    color:#c58634;
+    font-weight:bold;
+}
+
+/* TABLES */
+.analysis-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.analysis-table th{
+    background:#5b3a22;
+    color:white;
+    padding:10px;
+}
+
+.analysis-table td{
+    border:1px solid #ddd;
+    padding:10px;
+    background:white;
+}
+
+/* FOOTER */
+.footer{
+    margin-top:30px;
+    background:#2b1d14;
+    color:white;
+    border-radius:18px;
+    padding:28px;
+    text-align:center;
+}
+
+.no-break{ page-break-inside:avoid; }
+
+</style>
 </head>
 
 <body>
 
-{% if watermark %}
-<div class="watermark">{{ watermark }}</div>
-{% endif %}
+<div class="watermark">SPIRITUALHUT</div>
 
-<div class="header">
-    {% if logo %}
-        <img src="{{ logo }}" class="logo"/>
-    {% endif %}
-    <h2>{{ company_name }}</h2>
-    <p>{{ phone }} | {{ email }}</p>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header no-break">
+<table class="header-table">
+<tr>
+
+<td class="header-left">
+    <div class="logo">
+        <img src="{{ logo_url }}">
+    </div>
+    <div class="brand-title">SPIRITUALHUT</div>
+    <div class="brand-subtitle">
+        Advanced Vastu Energy & Sacred Geometry Analysis
+    </div>
+</td>
+
+<td class="header-right">
+    <small>Prepared By</small>
+    <div class="consultant-name">{{ consultant.name }}</div>
+    <div>{{ consultant.title }}</div>
+</td>
+
+</tr>
+</table>
 </div>
 
-<hr/>
+<!-- MAIN -->
+<table style="width:100%; border-collapse:separate; border-spacing:20px;">
+<tr>
 
-<h3>Project: {{ project_name }}</h3>
+<!-- LEFT -->
+<td style="width:50%; vertical-align:top;">
 
-<div class="section">
-    <h3>Rooms Analysis</h3>
-    {% for room in rooms %}
-        <p>
-            <b>{{ room.name }}</b> -
-            {{ room.direction_16 }} /
-            {{ room.direction_32 }}
-            <span class="{{ room.result }}">{{ room.result }}</span>
-        </p>
-        <p>{{ room.description }}</p>
-    {% endfor %}
+<div class="card no-break">
+    <div class="card-title">Client & Property Details</div>
+
+    <table style="width:100%; border-spacing:12px;">
+
+        <tr>
+            <td>
+                <div class="info-box">
+                    <h4>Client Name</h4>
+                    <p>{{ client.name }}</p>
+                </div>
+            </td>
+
+            <td>
+                <div class="info-box">
+                    <h4>Property</h4>
+                    <p>{{ property.type }}</p>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="info-box {{ property.entrance_class }}">
+                    <h4>Main Entrance</h4>
+                    <p>{{ property.entrance }}</p>
+                </div>
+            </td>
+
+            <td>
+                <div class="info-box {{ property.kitchen_class }}">
+                    <h4>Kitchen</h4>
+                    <p>{{ property.kitchen }}</p>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="info-box {{ property.bedroom_class }}">
+                    <h4>Master Bedroom</h4>
+                    <p>{{ property.master_bedroom }}</p>
+                </div>
+            </td>
+
+            <td>
+                <div class="info-box {{ property.concern_class }}">
+                    <h4>Concern Area</h4>
+                    <p>{{ property.concern }}</p>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+
+    <div class="score-card">
+        <div class="score">{{ score.overall }}</div>
+        <div>Overall Vastu Rating After Remedies</div>
+    </div>
+
 </div>
 
-<div class="section">
-    <h3>Objects Analysis</h3>
-    {% for obj in objects %}
-        <p>
-            <b>{{ obj.name }}</b> -
-            {{ obj.direction_16 }}
-            <span class="{{ obj.result }}">{{ obj.result }}</span>
-        </p>
-    {% endfor %}
+</td>
+
+<!-- RIGHT -->
+<td style="width:50%; vertical-align:top;">
+
+<div class="card no-break">
+    <div class="card-title">Rating Points Breakdown</div>
+
+    <table class="analysis-table">
+        <tr>
+            <th>Category</th>
+            <th>Points</th>
+        </tr>
+
+        {% for item in ratings %}
+        <tr>
+            <td>{{ item.category }}</td>
+            <td>{{ item.points }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
 </div>
 
-<div class="section">
-    <h3>User Notes</h3>
-    <p>{{ notes }}</p>
+</td>
+</tr>
+</table>
+
+<!-- CHART -->
+<div class="card no-break">
+    <div class="card-title">Energy Analysis Chart</div>
+    <div style="text-align:center;">
+        <img src="{{ chart_url }}"
+             style="width:360px; border:1px solid #e7d9c8; border-radius:12px; padding:10px;">
+    </div>
+</div>
+
+<!-- ROOM ANALYSIS -->
+<div class="card">
+    <div class="card-title">Room Wise Analysis</div>
+
+    <table class="analysis-table">
+        <tr>
+            <th>Room</th>
+            <th>Direction</th>
+            <th>Status</th>
+            <th>Color</th>
+            <th>Remedy</th>
+        </tr>
+
+        {% for room in rooms %}
+        <tr>
+            <td>{{ room.name }}</td>
+            <td>{{ room.direction }}</td>
+            <td>{{ room.status }}</td>
+            <td>{{ room.color }}</td>
+            <td>{{ room.remedy }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+
+<!-- DETAILED ANALYSIS -->
+<div class="card no-break">
+    <div class="card-title">Detailed Vastu Analysis</div>
+
+    <table style="width:100%; border-spacing:12px;">
+        {% for row in analysis_rows %}
+        <tr>
+            {% for box in row %}
+            <td style="width:50%; vertical-align:top;">
+                <div class="info-box {{ box.type }}">
+                    <h4>{{ box.title }}</h4>
+                    <p>{{ box.description }}</p>
+                </div>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<!-- REMEDIES -->
+<div class="card">
+    <div class="card-title">Suggested Remedies</div>
+
+    <ul>
+        {% for remedy in remedies %}
+        <li>{{ remedy }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <h3>SPIRITUALHUT</h3>
+    <p>{{ footer.note }}</p>
+    <p>© SpiritualHut • Sacred Geometry & Vastu Diagnostics</p>
+</div>
+
 </div>
 
 </body>
