@@ -1,0 +1,702 @@
+-- MySQL dump 10.13  Distrib 8.0.46, for macos14.8 (x86_64)
+--
+-- Host: localhost    Database: vastu_saas
+-- ------------------------------------------------------
+-- Server version	8.0.46
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `alembic_version`
+--
+
+DROP TABLE IF EXISTS `alembic_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `alembic_version` (
+  `version_num` varchar(32) NOT NULL,
+  PRIMARY KEY (`version_num`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `alembic_version`
+--
+
+LOCK TABLES `alembic_version` WRITE;
+/*!40000 ALTER TABLE `alembic_version` DISABLE KEYS */;
+INSERT INTO `alembic_version` VALUES ('64156ddf76aa');
+/*!40000 ALTER TABLE `alembic_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `canvas_states`
+--
+
+DROP TABLE IF EXISTS `canvas_states`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `canvas_states` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `zoom` float DEFAULT NULL,
+  `pan_x` float DEFAULT NULL,
+  `pan_y` float DEFAULT NULL,
+  `rotation` int DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `canvas_states_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `canvas_states`
+--
+
+LOCK TABLES `canvas_states` WRITE;
+/*!40000 ALTER TABLE `canvas_states` DISABLE KEYS */;
+INSERT INTO `canvas_states` VALUES (1,1,1.2,-268.021,-118.391,0,'2026-05-13 18:17:18'),(2,4,1,0,0,0,'2026-05-16 04:51:17'),(3,2,1,0,0,0,'2026-05-14 23:39:54'),(4,6,0.980197,0,0,0,'2026-05-15 17:42:19'),(5,3,0.923112,0,0,0,'2026-05-15 17:27:48'),(6,5,1,0,0,0,'2026-05-15 15:28:28'),(7,7,1,-3.11206,4.67529,0,'2026-05-14 23:46:20'),(8,8,1,0,0,0,NULL),(9,9,1,0,0,0,NULL),(10,10,1,0,0,0,NULL),(11,11,1,0,0,0,NULL),(12,12,1,0,0,0,NULL),(13,13,1,0,0,0,NULL),(14,14,1,0,0,0,NULL),(15,15,1,0,0,0,NULL),(16,16,0.896,0,0,0,'2026-05-16 04:04:09'),(17,17,1,0,0,0,NULL),(18,18,1,0,0,0,NULL),(29,21,1,0,0,0,NULL),(30,20,0.873761,0,0,0,'2026-05-18 07:23:13');
+/*!40000 ALTER TABLE `canvas_states` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `directions`
+--
+
+DROP TABLE IF EXISTS `directions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `directions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `system_type` varchar(10) NOT NULL,
+  `degree_start` float NOT NULL,
+  `degree_end` float NOT NULL,
+  `sort_order` int DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `directions`
+--
+
+LOCK TABLES `directions` WRITE;
+/*!40000 ALTER TABLE `directions` DISABLE KEYS */;
+INSERT INTO `directions` VALUES (1,'N','North','16',348.75,11.25,1,1),(2,'NNE','North North East','16',11.25,33.75,2,1),(3,'NE','North East','16',33.75,56.25,3,1),(4,'ENE','East North East','16',56.25,78.75,4,1),(5,'E','East','16',78.75,101.25,5,1),(6,'ESE','East South East','16',101.25,123.75,6,1),(7,'SE','South East','16',123.75,146.25,7,1),(8,'SSE','South South East','16',146.25,168.75,8,1),(9,'S','South','16',168.75,191.25,9,1),(10,'SSW','South South West','16',191.25,213.75,10,1),(11,'SW','South West','16',213.75,236.25,11,1),(12,'WSW','West South West','16',236.25,258.75,12,1),(13,'W','West','16',258.75,281.25,13,1),(14,'WNW','West North West','16',281.25,303.75,14,1),(15,'NW','North West','16',303.75,326.25,15,1),(16,'NNW','North North West','16',326.25,348.75,16,1);
+/*!40000 ALTER TABLE `directions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `generated_reports`
+--
+
+DROP TABLE IF EXISTS `generated_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `generated_reports` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `language_id` int DEFAULT NULL,
+  `overall_score` int DEFAULT NULL,
+  `report_snapshot_json` json DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `language_id` (`language_id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `generated_reports_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `languages` (`id`),
+  CONSTRAINT `generated_reports_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `generated_reports`
+--
+
+LOCK TABLES `generated_reports` WRITE;
+/*!40000 ALTER TABLE `generated_reports` DISABLE KEYS */;
+/*!40000 ALTER TABLE `generated_reports` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `languages`
+--
+
+DROP TABLE IF EXISTS `languages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `languages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `code` varchar(10) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `is_default` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `languages`
+--
+
+LOCK TABLES `languages` WRITE;
+/*!40000 ALTER TABLE `languages` DISABLE KEYS */;
+INSERT INTO `languages` VALUES (1,'en','English',1,1);
+/*!40000 ALTER TABLE `languages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `objects`
+--
+
+DROP TABLE IF EXISTS `objects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `objects` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `coordinates` json DEFAULT NULL,
+  `center_x` int DEFAULT NULL,
+  `center_y` int DEFAULT NULL,
+  `direction_16` varchar(50) DEFAULT NULL,
+  `direction_32` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `objects_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `objects`
+--
+
+LOCK TABLES `objects` WRITE;
+/*!40000 ALTER TABLE `objects` DISABLE KEYS */;
+/*!40000 ALTER TABLE `objects` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `plans`
+--
+
+DROP TABLE IF EXISTS `plans`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `plans` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `price` int NOT NULL,
+  `duration_days` int NOT NULL,
+  `report_limit` int NOT NULL,
+  `is_whitelabel` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `plans`
+--
+
+LOCK TABLES `plans` WRITE;
+/*!40000 ALTER TABLE `plans` DISABLE KEYS */;
+INSERT INTO `plans` VALUES (1,'Pro Plan',999,30,20,1);
+/*!40000 ALTER TABLE `plans` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `polygons`
+--
+
+DROP TABLE IF EXISTS `polygons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `polygons` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `parent_id` int DEFAULT NULL,
+  `type` varchar(50) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `coordinates` json NOT NULL,
+  `centroid` json DEFAULT NULL,
+  `direction` varchar(20) DEFAULT NULL,
+  `direction_angle` float DEFAULT NULL,
+  `color` varchar(7) DEFAULT NULL,
+  `extra_data` json DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `polygons_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `polygons` (`id`),
+  CONSTRAINT `polygons_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `polygons`
+--
+
+LOCK TABLES `polygons` WRITE;
+/*!40000 ALTER TABLE `polygons` DISABLE KEYS */;
+INSERT INTO `polygons` VALUES (8,4,NULL,'outer_boundary','Outer Boundary','[[0.33298246041017654, 0.176252698843062], [0.6807076680944963, 0.17795404498298087], [0.6793182468117211, 0.7563772897731388], [0.33207330277899466, 0.7592933981885501]]','[0.5062704195238472, 0.46746935794693295]',NULL,NULL,NULL,NULL,'2026-05-15 14:55:30'),(9,5,NULL,'outer_boundary','Outer Boundary','[[0.3836540943118023, 0.21177614992214655], [0.368148407584534, 0.21428000581637455], [0.3676788551908911, 0.6989144229115368], [0.4340414045260579, 0.6962191867938876], [0.4299661194671599, 0.908662621419648], [0.6156949590918679, 0.9198569500018106], [0.6164441767263759, 0.7153007003412877], [0.5858971901771807, 0.7154799866924971], [0.5815038631514473, 0.5313611080306706], [0.5720351111232801, 0.5295602526615005], [0.5751889744775441, 0.4554093273600449], [0.627421441479264, 0.453573321964622], [0.6289744471216251, 0.22047100752281287], [0.5770249094423352, 0.21977709508301344], [0.564578491084177, 0.014892701892698071], [0.40772067473065937, 0.012483263071000507], [0.40642873223325543, 0.21348782182430476]]','[0.5142589324658504, 0.4547944660770504]',NULL,NULL,NULL,NULL,'2026-05-15 15:28:05'),(13,3,NULL,'outer_boundary','Outer Boundary','[[0.3898322718413324, 0.2167697875552216], [0.3735655787577882, 0.2158612972891621], [0.3668668594439577, 0.6967215421992685], [0.4198896461558119, 0.7046868776252897], [0.42236198195539654, 0.7684952790049246], [0.43317398277274793, 0.77568038286229], [0.4271328649788259, 0.9092446124981894], [0.6159180574823144, 0.9177669025655416], [0.620161997318763, 0.7222135152628911], [0.5849457896263305, 0.7190941449250434], [0.5845713392596379, 0.5324283392100594], [0.5681042062159268, 0.5258221145576839], [0.5747778903410566, 0.4554797688613485], [0.6265849492755386, 0.4554797688613485], [0.6307934595664589, 0.21844450595895495], [0.5690293673538097, 0.2200558553012746], [0.5652510186469691, 0.014225452551283676], [0.4092444303993867, 0.015263792813722116], [0.4087857477142556, 0.2123940689953288]]','[0.5047890231108583, 0.48926989520520137]',NULL,NULL,NULL,NULL,'2026-05-15 17:25:41'),(14,3,13,'room','Kitchen','[[0.0004645523673401196, 0.0007454339856574692], [0.0005381497613861306, 0.0007517138407837243], [0.000540849877790251, 0.001021398468430137], [0.0004626745301243672, 0.001022780187436631]]','[0.0005015566341602171, 0.0008853316205769903]','NE',NULL,'#33fa00',NULL,'2026-05-15 17:26:26'),(15,6,NULL,'outer_boundary','Outer Boundary','[[0.6038067937516225, 0.7555936634333358], [0.33290909780024985, 0.7610285505911428], [0.3306015505845178, 0.18143389758201767], [0.6807464567919262, 0.17227611342835675], [0.6836591583917445, 0.7576361133491454]]','[0.5263446114640121, 0.5255936676767996]',NULL,NULL,NULL,NULL,'2026-05-15 17:42:10'),(16,6,15,'room','Master Bedroom','[[0.00041819250596027634, 0.00030802249724269144], [0.0004209919312537521, 0.0007648804842527883], [0.0006294386359637648, 0.0007627244509523464], [0.0006272935322635765, 0.000321750103069024]]','[0.0005239791513603425, 0.0005393443838792125]','NE',NULL,'#64bdc2',NULL,'2026-05-15 17:42:59'),(17,6,15,'room','Pooja Room','[[0.0006389808060595551, 0.0003018781972143262], [0.0006468606317030926, 0.000760274204152484], [0.0008380267181871836, 0.0007629735187104698], [0.0008426022158233549, 0.00032354620811606797]]','[0.0007416175929432965, 0.0005371680320483369]','NE',NULL,'#c859ff',NULL,'2026-05-15 17:43:34'),(19,7,NULL,'outer_boundary','Outer Boundary','[[0.411238657475013, 0.01516557430475087], [0.555987048124351, 0.019594070947322205], [0.5495177018431984, 0.2159324106722552], [0.6284543489988966, 0.22740581773247392], [0.6300114743558541, 0.4555437744423523], [0.5754397700261228, 0.454362535531938], [0.5734227577597677, 0.5263663388072132], [0.5836053612571391, 0.5338919806452781], [0.5850271064544392, 0.715856806289832], [0.6200423354547963, 0.7174910349751955], [0.6183033088533554, 0.9151487560426926], [0.4303937775323696, 0.9026858439174754], [0.43203450140551986, 0.6807348576232981], [0.365800138574523, 0.6768603628784038], [0.3693476248134086, 0.20898681499176203], [0.4082245475159008, 0.2126234282209589]]','[0.5210531537777909, 0.4674156505014501]',NULL,NULL,NULL,NULL,'2026-05-15 19:56:23'),(20,1,NULL,'outer_boundary','Outer Boundary','[[0.3320506126586027, 0.17443508179135284], [0.6799848800136293, 0.17579610212376884], [0.6820603922272521, 0.7588643132604287], [0.33018327279254284, 0.7545344241110226]]','[0.5060697894230067, 0.46590748032164325]',NULL,NULL,NULL,NULL,'2026-05-15 20:00:03'),(21,2,NULL,'outer_boundary','Outer Boundary','[[0.3323704292717257, 0.1767028950042548], [0.6803211121049131, 0.1748967353051673], [0.6824291383737344, 0.7600211522532228], [0.3308320644612377, 0.7595292640588789]]','[0.5064881860529027, 0.4677875116553809]',NULL,NULL,NULL,NULL,'2026-05-15 20:04:44'),(22,2,21,'room','Living Room','[[0.00041797336883386474, 0.000322990785836713], [0.00041747333847473714, 0.0007650221687985829], [0.000626084792155962, 0.0007698343747736819], [0.0006299726143556715, 0.0003071875957136865]]','[0.0005228760284550589, 0.000541258731280666]','NW',NULL,'#f45b0e',NULL,'2026-05-15 20:05:04'),(23,2,21,'room','Master Bedroom','[[0.0006375160098447235, 0.0003069766601939697], [0.0006391951104438441, 0.0007662138749200343], [0.0008427026734792803, 0.0007657731440408942], [0.0008456321866836627, 0.00031742271284837894]]','[0.0007412614951128777, 0.0005390965980008193]','NW',NULL,'#64bdc2',NULL,'2026-05-15 20:05:24'),(24,8,NULL,'outer_boundary','Outer Boundary','[[0.3308135891257788, 0.17847885538501232], [0.6804274641217225, 0.1776748250561269], [0.6836895175193082, 0.7577342080904186], [0.3337266710069444, 0.7590829223774261]]','[0.5071643104434385, 0.468242702727246]',NULL,NULL,NULL,NULL,'2026-05-15 20:10:39'),(25,8,24,'room','Master Bedroom','[[0.0004201235033393773, 0.0003238047057940445], [0.000418299341251298, 0.0007660634676983753], [0.0006291790543315566, 0.00076734169333448], [0.0006290774875217014, 0.00030618937976022354]]','[0.0005241698466109834, 0.0005408498116467809]','NW',NULL,'#64bdc2',NULL,'2026-05-15 20:11:21'),(26,9,NULL,'outer_boundary','Outer Boundary','[[0.3320528626565745, 0.17584253269164615], [0.6823689905406283, 0.17638580216179026], [0.6823744412399403, 0.7543122080496814], [0.331565880701178, 0.7599930746668598]]','[0.5070905437845803, 0.46663340439249446]',NULL,NULL,NULL,NULL,'2026-05-15 20:15:52'),(27,9,26,'room','Living Room','[[0.0004252946958611192, 0.00032810586905009776], [0.0004237036937741353, 0.0007589627380488968], [0.0006217591314424731, 0.0007589584945849628], [0.000623811620789525, 0.00032356883992371575]]','[0.0005236422854668131, 0.0005423989854019183]','NW',NULL,'#f45b0e',NULL,'2026-05-15 20:16:05'),(28,10,NULL,'outer_boundary','Outer Boundary','[[0.33031643464434063, 0.17447886019427145], [0.6819843359577816, 0.17921506101535342], [0.6833656445718134, 0.7551244070466396], [0.3331358722437208, 0.754804237692823]]','[0.5072005718544141, 0.4659056414872718]',NULL,NULL,NULL,NULL,'2026-05-15 20:23:21'),(29,10,28,'room','Living Room','[[0.000640551368024119, 0.000304132655303236], [0.0006394631295684466, 0.0007543825081021871], [0.0008413491887838298, 0.0007639884138346732], [0.0008443112635785794, 0.0003175761847939902]]','[0.0007414187374887437, 0.0005350199405085216]','NW',NULL,'#f45b0e',NULL,'2026-05-15 20:23:45'),(30,12,NULL,'outer_boundary','Outer Boundary','[[0.33278553805247274, 0.17612539492504345], [0.6831831095250843, 0.17344140398681923], [0.6826037508923936, 0.757368350774913], [0.3338483927282094, 0.7576426907182431]]','[0.50810519779954, 0.4661444601012548]',NULL,NULL,NULL,NULL,'2026-05-15 20:55:31'),(31,12,30,'room','Living Room','[[0.00042432026452117, 0.0003218220651449039], [0.00042208947867990653, 0.0007502827325719994], [0.0006206937494802822, 0.0007569986036174681], [0.0006225627134645963, 0.0003332843684744954]]','[0.0005224165515364887, 0.0005405969424522167]','NW',NULL,'#f45b0e',NULL,'2026-05-15 20:55:44'),(32,13,NULL,'outer_boundary','Outer Boundary','[[0.3290541540920301, 0.3905680668588862], [0.33156955675420235, 0.7602455607709299], [0.6836999752563603, 0.7579926350439963], [0.6816086179865979, 0.17688140338707634], [0.33087855385595144, 0.17515940572267888]]','[0.4713621715890284, 0.45216941435671354]',NULL,NULL,NULL,NULL,'2026-05-15 21:03:59'),(33,13,32,'room','Living Room','[[0.0004207995326595762, 0.00030878968015975037], [0.0004219151434497299, 0.0007583835052219124], [0.0006225397777458342, 0.0007539652341486819], [0.0006240252121462876, 0.000313646560380154]]','[0.000522319916500357, 0.0005336962449776246]','NW',NULL,'#f45b0e',NULL,'2026-05-15 21:04:13'),(34,13,32,'room','Bathroom','[[0.0006375599006502304, 0.0003092581703654584], [0.00063729552588854, 0.0007504356151476197], [0.0008388896399445498, 0.0007587558691821166], [0.0008415199984890155, 0.00031885305487911597]]','[0.000738816266243084, 0.0005343256773935777]','NW',NULL,'#a4db21',NULL,'2026-05-15 21:04:39'),(35,13,32,'room','Master Bedroom','[[0.0004232987337518456, 0.0007979310567243627], [0.0004210687005507488, 0.0012382605749007218], [0.0006202260034230392, 0.0012410309674796012], [0.0006212452762718637, 0.0008273344898187041]]','[0.0005214596784993744, 0.0010261392722308474]','NW',NULL,'#64bdc2',NULL,'2026-05-15 21:04:59'),(36,13,32,'room','Guest Room','[[0.0006469618023865444, 0.0007951514699736263], [0.0006450581773419247, 0.0012374418221094655], [0.0008418193115994938, 0.0012380918972093472], [0.0008371000993041358, 0.0008093742644662514]]','[0.0007427348476580246, 0.0010200148634396727]','NW',NULL,'#33c817',NULL,'2026-05-15 21:05:19'),(37,11,NULL,'outer_boundary','Outer Boundary','[[0.41177422037253375, 0.017918433126403174], [0.5532719026844821, 0.01592678101010284], [0.5551631685853128, 0.2165354068972697], [0.4077208014911085, 0.214047145732999]]','[0.4819825232833593, 0.11610694169169368]',NULL,NULL,NULL,NULL,'2026-05-15 21:42:00'),(38,14,NULL,'outer_boundary','Outer Boundary','[[0.33274006274135187, 0.17906954556461835], [0.680072534864194, 0.1776957948404005], [0.6814606251622534, 0.7550248270929896], [0.32949724524191976, 0.7539843297363847]]','[0.5059426170024297, 0.4664436243085983]',NULL,NULL,NULL,NULL,'2026-05-15 22:09:39'),(39,14,38,'room','Bedroom','[[0.00042287369012089905, 0.00031310675640555593], [0.0004211615921923676, 0.0006865358849942062], [0.0005132060382720218, 0.0006912230266572519], [0.0005104671410929996, 0.00030798860846821893]]','[0.000466927115419572, 0.0004997135691313082]','NW',NULL,'#4840d2',NULL,'2026-05-15 22:26:14'),(40,15,NULL,'outer_boundary','Outer Boundary','[[0.3962476815513856, 0.21402341769716832], [0.37345425139335087, 0.21370650166570104], [0.3671107465480595, 0.6966401384161356], [0.4194895901783976, 0.7033711209081692], [0.420368071780893, 0.7719232906195683], [0.4332149897780374, 0.7761449714386588], [0.43186090297045365, 0.9090221842636516], [0.6166473103460864, 0.9182862318266584], [0.6191729489145249, 0.7190708765978057], [0.5854587257836839, 0.7216717663673233], [0.5843498253748053, 0.5304308700119496], [0.574177109192465, 0.5310665409092555], [0.5755077136268497, 0.4521751713227839], [0.6275044695734359, 0.45908289408766656], [0.6306790582611306, 0.21887518218605156], [0.5646437093352479, 0.22042758274188876], [0.5665542428243445, 0.014456084816093931], [0.41035719700196327, 0.010889771639402884]]','[0.5109332524686175, 0.5045146998619964]',NULL,NULL,NULL,NULL,'2026-05-16 04:01:27'),(41,16,NULL,'outer_boundary','Outer Boundary','[[0.37003526855975793, 0.2128459271798957], [0.6322751624561916, 0.22160928136089583], [0.6193754487319899, 0.7096923969573797], [0.36768047138661736, 0.6995476891792801]]','[0.4973415877836392, 0.4609238236693629]',NULL,NULL,NULL,NULL,'2026-05-16 04:04:01'),(42,17,NULL,'outer_boundary','Outer Boundary','[[0.3084932084517045, 0.21540107636440395], [0.2842386973987926, 0.21335146942501113], [0.27292924360795456, 0.698136209592117], [0.36614496404474434, 0.7031411648929261], [0.36804243607954545, 0.7709567325981665], [0.3872237881747159, 0.775359237562166], [0.38110470858487216, 0.9105514562611342], [0.6996124822443182, 0.9212421045733744], [0.7022253972833807, 0.7123763929353474], [0.6418876509232955, 0.7196577710946779], [0.643603682084517, 0.5306927823680597], [0.6273974054509943, 0.5312343425252375], [0.6275336248224432, 0.4534593160815024], [0.7149830766157671, 0.46026089412299587], [0.7248203346946023, 0.22091160137692992], [0.610262284712358, 0.2199887527139623], [0.6113752330433239, 0.016308510388444553], [0.3453782792524858, 0.01168469861680708]]','[0.5176253609705452, 0.504706361860737]',NULL,NULL,NULL,NULL,'2026-05-16 04:21:00'),(43,18,NULL,'outer_boundary','Outer Boundary','[[0.32173135339763687, 0.4993470016249638], [0.325701272217587, 0.7569429435155345], [0.6895665042222896, 0.7589140325128548], [0.6897307789955839, 0.42802575952346467], [0.6904392345309129, 0.17296281197946842], [0.3250976694183185, 0.17449413666443367]]','[0.5070444687970548, 0.4651144476367867]',NULL,NULL,NULL,NULL,'2026-05-16 04:31:49'),(57,21,NULL,'outer_boundary','Outer Boundary','[[0.4310594083421824, 0.21475848507923512], [0.4125068277731425, 0.21771234813846027], [0.41025339926973775, 0.6947949478935391], [0.4459992936513956, 0.7056311273659525], [0.453869734252798, 0.9121681335340808], [0.5810944558218716, 0.9176813535537856], [0.5814592840859291, 0.7222906895259769], [0.5604801116252023, 0.7218725499209037], [0.5559462595654665, 0.5338559735096581], [0.5475382882028722, 0.5324634396161745], [0.551893775388518, 0.4516722982349023], [0.5860054485234628, 0.4596481187728963], [0.5890208617769013, 0.22088124358209368], [0.5489585571947478, 0.2246585391977964], [0.5437146694014631, 0.02094939589288688], [0.4409288655335592, 0.01215770443633437]]','[0.5150455775255782, 0.4726997717659172]',NULL,NULL,NULL,NULL,'2026-05-16 10:55:32'),(58,21,57,'room','Living Room','[[0.0005237821725065525, 0.0003865106378242488], [0.000683544368805623, 0.0003892620079894261], [0.0006826752597845874, 0.000741994709852816], [0.0005200364443090741, 0.000726402738942699]]','[0.0006025095613514592, 0.0005610425236522974]','NE',NULL,'#f45b0e',NULL,'2026-05-16 10:55:55'),(59,21,58,'object','Dining Table','[[0.0005939601745934677, 0.0005561998456522444]]','[0.0005939601745934677, 0.0005561998456522444]','NE',NULL,NULL,'{\"rotation\": 0}','2026-05-16 10:56:10'),(60,20,NULL,'outer_boundary','Outer Boundary','[[0.3901211472133731, 0.2122440625452636], [0.36776720230119, 0.21459151143132604], [0.362939268768541, 0.6979458522686124], [0.4161733814556365, 0.7049216119052361], [0.41938259943660666, 0.7720901294765715], [0.4310563137873348, 0.7806792541008836], [0.4264892775649778, 0.90704282051166], [0.6226127813806297, 0.9222556387148756], [0.6273938686202131, 0.7198235963752897], [0.5893233380528586, 0.7169726958556634], [0.587366855131641, 0.5372424783187283], [0.5750014090100796, 0.530384262633075], [0.5742975623862258, 0.4552296166624421], [0.6339800689598504, 0.4568253712748045], [0.6363743984712109, 0.2229201580944923], [0.5657598172448085, 0.21737048523727187], [0.5685732284924487, 0.015105847549880504], [0.40602179304038566, 0.011161901445267236], [0.4080912930551342, 0.21286721522396437]]','[0.5057224002301656, 0.48987760576975303]',NULL,NULL,NULL,NULL,'2026-05-16 11:15:17'),(61,20,60,'room','Living Room','[[0.00046322276291337983, 0.0003635184596339079], [0.000462675043165748, 0.0004874379204801262], [0.000546221810251378, 0.0004966126431273235], [0.0005531082647132257, 0.0007239650050016295], [0.0007187160421986668, 0.0007363613418926829], [0.000717052801270058, 0.0003806717195949208]]','[0.0005768327874187427, 0.0005314278482884319]','NE',NULL,'#f45b0e',NULL,'2026-05-16 11:16:05'),(62,20,61,'object','Sofa','[[0.0006315071245870415, 0.0005669576645634173]]','[0.0006315071245870415, 0.0005669576645634173]','NE',NULL,NULL,'{\"rotation\": 0}','2026-05-16 11:16:17'),(63,20,60,'room','Dining Room','[[0.0004624384660936868, 0.000516017296453294], [0.0005305686712007822, 0.0005151079574944477], [0.0005384962046930834, 0.0007217144367546592], [0.0004621413970585138, 0.0007280845833635091]]','[0.0004984111847615166, 0.0006202310685164775]','NE',NULL,'#7ff718',NULL,'2026-05-16 11:16:52'),(64,20,63,'object','Dining Table','[[0.0004995456354003379, 0.0006060907710883183]]','[0.0004995456354003379, 0.0006060907710883183]','NE',NULL,NULL,'{\"rotation\": 0}','2026-05-16 11:17:14');
+/*!40000 ALTER TABLE `polygons` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_images`
+--
+
+DROP TABLE IF EXISTS `project_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `image_path` varchar(500) NOT NULL,
+  `original_filename` varchar(255) DEFAULT NULL,
+  `uploaded_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `project_images_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_images`
+--
+
+LOCK TABLES `project_images` WRITE;
+/*!40000 ALTER TABLE `project_images` DISABLE KEYS */;
+INSERT INTO `project_images` VALUES (7,6,'/storage/projects/6/floorplan.webp','floor_plan1.webp','2026-05-13 22:41:41'),(10,5,'/storage/projects/5/floorplan.jpeg','newplan.jpeg','2026-05-14 19:14:23'),(15,3,'/storage/projects/3/floorplan.jpeg','newplan.jpeg','2026-05-14 21:44:10'),(22,7,'/storage/projects/7/floorplan.jpeg','newplan.jpeg','2026-05-14 23:40:22'),(24,4,'/storage/projects/4/floorplan.webp','floor_plan1.webp','2026-05-15 14:55:03'),(25,5,'/storage/projects/5/floorplan.webp','floor_plan1.webp','2026-05-15 15:27:23'),(26,1,'/storage/projects/1/floorplan.webp','floor_plan1.webp','2026-05-15 19:47:05'),(27,1,'/storage/projects/1/floorplan.webp','floor_plan1.webp','2026-05-15 19:47:21'),(28,8,'/storage/projects/8/floorplan.webp','floor_plan1.webp','2026-05-15 20:10:22'),(29,9,'/storage/projects/9/floorplan.webp','floor_plan1.webp','2026-05-15 20:15:38'),(31,11,'/storage/projects/11/floorplan.jpeg','newplan.jpeg','2026-05-15 20:32:11'),(32,10,'/storage/projects/10/floorplan.jpeg','newplan.jpeg','2026-05-15 20:53:30'),(33,12,'/storage/projects/12/floorplan.webp','floor_plan1.webp','2026-05-15 20:55:16'),(34,13,'/storage/projects/13/floorplan.webp','floor_plan1.webp','2026-05-15 21:03:42'),(36,14,'/storage/projects/14/floorplan.webp','floor_plan1.webp','2026-05-15 22:09:26'),(37,2,'/storage/projects/2/floorplan.webp','floor_plan1.webp','2026-05-16 03:54:57'),(38,15,'/storage/projects/15/floorplan.jpeg','newplan.jpeg','2026-05-16 03:59:54'),(39,16,'/storage/projects/16/floorplan.jpeg','newplan.jpeg','2026-05-16 04:03:39'),(40,17,'/storage/projects/17/floorplan.jpeg','newplan.jpeg','2026-05-16 04:10:13'),(41,18,'/storage/projects/18/floorplan.webp','floor_plan1.webp','2026-05-16 04:31:20'),(54,21,'/storage/projects/21/floorplan.jpeg','newplan.jpeg','2026-05-16 10:54:49'),(55,20,'/storage/projects/20/floorplan.jpeg','newplan.jpeg','2026-05-16 11:14:32');
+/*!40000 ALTER TABLE `project_images` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `project_objects`
+--
+
+DROP TABLE IF EXISTS `project_objects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_objects` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `report_entity_id` int NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `coordinates` json DEFAULT NULL,
+  `center_x` int DEFAULT NULL,
+  `center_y` int DEFAULT NULL,
+  `angle` float DEFAULT NULL,
+  `direction_16` varchar(50) DEFAULT NULL,
+  `direction_32` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  KEY `report_entity_id` (`report_entity_id`),
+  CONSTRAINT `project_objects_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`),
+  CONSTRAINT `project_objects_ibfk_2` FOREIGN KEY (`report_entity_id`) REFERENCES `report_entities` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `project_objects`
+--
+
+LOCK TABLES `project_objects` WRITE;
+/*!40000 ALTER TABLE `project_objects` DISABLE KEYS */;
+/*!40000 ALTER TABLE `project_objects` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `projects`
+--
+
+DROP TABLE IF EXISTS `projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `projects` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `name` varchar(150) DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `starting_degree` int DEFAULT NULL,
+  `description` text,
+  `rotation` int DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  `updated_at` datetime DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `client_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `projects_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `projects`
+--
+
+LOCK TABLES `projects` WRITE;
+/*!40000 ALTER TABLE `projects` DISABLE KEYS */;
+INSERT INTO `projects` VALUES (1,2,'Demo Project',NULL,0,'Test project for Vastu analysis',0,'2026-05-14 00:18:46','2026-05-15 19:48:18','boundary_drawn',NULL),(2,2,'Demo Project2',NULL,0,'Demo Project2',0,'2026-05-14 00:20:56','2026-05-15 22:07:28','uploaded',NULL),(3,2,'Demo Project3',NULL,268,'Demo Project3',0,'2026-05-14 10:02:11','2026-05-15 17:23:23','boundary_drawn',NULL),(4,2,'project 4',NULL,278,'project 4',0,'2026-05-14 10:57:21','2026-05-15 14:58:34','boundary_drawn',NULL),(5,2,'project5',NULL,270,'project5',0,'2026-05-14 18:04:56','2026-05-15 15:28:48','boundary_drawn',NULL),(6,2,'project 6','',265,'project6',0,'2026-05-14 18:06:06','2026-05-15 17:42:10','boundary_drawn',NULL),(7,2,'project7',NULL,5,'project7',0,'2026-05-14 18:06:27','2026-05-15 16:28:34','boundary_drawn',NULL),(8,2,'project8','',0,'project8',0,'2026-05-15 20:10:03','2026-05-15 20:10:39','boundary_drawn',NULL),(9,2,'project9','',0,'',0,'2026-05-15 20:15:25','2026-05-15 20:15:52','boundary_drawn',NULL),(10,2,'project 10',NULL,0,'project 10',0,'2026-05-15 20:22:46','2026-05-15 20:53:30','uploaded',NULL),(11,2,'11','',0,'11',0,'2026-05-15 20:31:52','2026-05-15 21:42:00','boundary_drawn',NULL),(12,2,'12','',0,'',0,'2026-05-15 20:55:02','2026-05-15 20:55:31','boundary_drawn',NULL),(13,2,'13','',0,'',0,'2026-05-15 21:03:28','2026-05-15 21:03:59','boundary_drawn',NULL),(14,2,'13','',0,'13',0,'2026-05-15 22:09:12','2026-05-15 22:09:39','boundary_drawn',NULL),(15,2,'14','',271,'t4',0,'2026-05-16 03:59:30','2026-05-16 04:01:27','boundary_drawn',NULL),(16,2,'15','',0,'15',0,'2026-05-16 04:03:12','2026-05-16 04:04:01','boundary_drawn',NULL),(17,2,'16','',272,'16',0,'2026-05-16 04:09:55','2026-05-16 04:21:00','boundary_drawn',NULL),(18,2,'18','',0,'18',0,'2026-05-16 04:30:58','2026-05-16 04:31:49','boundary_drawn',NULL),(19,2,'19','',0,'19',0,'2026-05-16 04:43:47','2026-05-16 06:40:58','uploaded',NULL),(20,2,'20',NULL,270,'20',0,'2026-05-16 05:00:56','2026-05-16 11:16:17','rooms_marked',NULL),(21,2,'21','',270,'21',0,'2026-05-16 05:43:10','2026-05-16 10:56:10','rooms_marked',NULL),(22,2,'22','',0,'22',0,'2026-05-16 09:49:24',NULL,'uploaded',NULL),(23,2,'23','',0,'23',0,'2026-05-16 09:49:59',NULL,'uploaded',NULL),(24,2,'22','',0,'22',0,'2026-05-16 09:50:30',NULL,'uploaded',NULL);
+/*!40000 ALTER TABLE `projects` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_entities`
+--
+
+DROP TABLE IF EXISTS `report_entities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `report_entities` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `slug` varchar(100) NOT NULL,
+  `category` varchar(20) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `description` text,
+  `icon` varchar(100) DEFAULT NULL,
+  `sort_order` int DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_entities`
+--
+
+LOCK TABLES `report_entities` WRITE;
+/*!40000 ALTER TABLE `report_entities` DISABLE KEYS */;
+INSERT INTO `report_entities` VALUES (1,'kitchen','room','Kitchen',NULL,NULL,1,1),(2,'bedroom','room','Bedroom',NULL,NULL,2,1),(3,'master-bedroom','room','Master Bedroom',NULL,NULL,3,1),(4,'toilet','room','Toilet',NULL,NULL,4,1),(5,'pooja-room','room','Pooja Room',NULL,NULL,5,1),(6,'living-room','room','Living Room',NULL,NULL,6,1),(7,'dining-room','room','Dining Room',NULL,NULL,7,1),(8,'staircase','object','Staircase',NULL,NULL,8,1),(9,'borewell','object','Borewell',NULL,NULL,9,1),(10,'septic-tank','object','Septic Tank',NULL,NULL,10,1),(11,'underground-water-tank','object','Underground Water Tank',NULL,NULL,11,1),(12,'overhead-water-tank','object','Overhead Water Tank',NULL,NULL,12,1);
+/*!40000 ALTER TABLE `report_entities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_items`
+--
+
+DROP TABLE IF EXISTS `report_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `report_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `generated_report_id` int NOT NULL,
+  `project_object_id` int NOT NULL,
+  `report_rule_id` int NOT NULL,
+  `criticality` varchar(20) DEFAULT NULL,
+  `score` int DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  KEY `generated_report_id` (`generated_report_id`),
+  KEY `project_object_id` (`project_object_id`),
+  KEY `report_rule_id` (`report_rule_id`),
+  CONSTRAINT `report_items_ibfk_1` FOREIGN KEY (`generated_report_id`) REFERENCES `generated_reports` (`id`),
+  CONSTRAINT `report_items_ibfk_2` FOREIGN KEY (`project_object_id`) REFERENCES `project_objects` (`id`),
+  CONSTRAINT `report_items_ibfk_3` FOREIGN KEY (`report_rule_id`) REFERENCES `report_rules` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_items`
+--
+
+LOCK TABLES `report_items` WRITE;
+/*!40000 ALTER TABLE `report_items` DISABLE KEYS */;
+/*!40000 ALTER TABLE `report_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_rules`
+--
+
+DROP TABLE IF EXISTS `report_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `report_rules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `report_entity_id` int NOT NULL,
+  `direction_id` int NOT NULL,
+  `criticality` varchar(20) NOT NULL,
+  `severity_color` varchar(20) DEFAULT NULL,
+  `score` int DEFAULT NULL,
+  `priority` int DEFAULT NULL,
+  `recommendation_priority` int DEFAULT NULL,
+  `is_premium` tinyint(1) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT (now()),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_report_entity_direction` (`report_entity_id`,`direction_id`),
+  KEY `direction_id` (`direction_id`),
+  CONSTRAINT `report_rules_ibfk_1` FOREIGN KEY (`direction_id`) REFERENCES `directions` (`id`),
+  CONSTRAINT `report_rules_ibfk_2` FOREIGN KEY (`report_entity_id`) REFERENCES `report_entities` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_rules`
+--
+
+LOCK TABLES `report_rules` WRITE;
+/*!40000 ALTER TABLE `report_rules` DISABLE KEYS */;
+/*!40000 ALTER TABLE `report_rules` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reports`
+--
+
+DROP TABLE IF EXISTS `reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reports` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `pdf_path` varchar(255) DEFAULT NULL,
+  `is_whitelabel` tinyint(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reports`
+--
+
+LOCK TABLES `reports` WRITE;
+/*!40000 ALTER TABLE `reports` DISABLE KEYS */;
+INSERT INTO `reports` VALUES (1,20,'storage/reports/project_20.pdf',0,'2026-05-16 13:26:03'),(2,20,'storage/reports/project_20.pdf',0,'2026-05-16 13:27:40'),(3,20,'storage/reports/project_20.pdf',0,'2026-05-16 13:28:03'),(4,20,'storage/reports/project_20.pdf',0,'2026-05-16 13:36:50'),(5,20,'storage/reports/project_20.pdf',0,'2026-05-16 13:38:13'),(6,20,'storage/reports/project_20.pdf',0,'2026-05-16 14:53:12'),(7,20,'storage/reports/project_20_463d05e8-329e-41b0-8df7-f8fd4c158771.pdf',0,'2026-05-16 15:36:29'),(8,20,'storage/reports/project_20_eaa3e07d-c9b8-4f05-b13f-905133af1b28.pdf',0,'2026-05-16 15:41:26'),(9,20,'storage/reports/project_20_4b6835f9-f501-40d1-821a-9ad342fcd9ef.pdf',0,'2026-05-16 16:01:24'),(10,20,'storage/reports/project_20_d1a03425-d712-4d38-86ba-e75e5585d409.pdf',0,'2026-05-16 16:29:40'),(11,20,'storage/reports/project_20_43580e88-860d-456f-aab7-1cce79d67b9e.pdf',0,'2026-05-16 16:47:57'),(12,20,'storage/reports/project_20_f2063d14-499d-4166-aad5-5460fef76067.pdf',0,'2026-05-16 16:51:49'),(13,20,'storage/reports/project_20_6b767308-d457-495a-87d8-b318cd174615.pdf',0,'2026-05-16 16:55:19'),(14,20,'storage/reports/project_20_8eccdb8d-513e-4d5e-a503-e134ff04f4c2.pdf',0,'2026-05-16 17:12:47'),(15,20,'storage/reports/project_20_3967aa59-11d7-4aaf-88d3-016f47265a30.pdf',0,'2026-05-16 17:29:59'),(16,20,'storage/reports/project_20_d247f168-6f67-4733-a94b-a034f08dd999.pdf',0,'2026-05-16 17:48:47'),(17,20,'storage/reports/project_20_9d26b0bf-757b-43c5-9fe2-173cbe2aae11.pdf',0,'2026-05-16 17:50:48'),(18,20,'storage/reports/project_20_c48a99a7-a448-45e1-929b-d245c8d360a9.pdf',0,'2026-05-16 17:53:41'),(19,20,'storage/reports/project_20_9d9a4512-35d6-47eb-b8da-64169a72c4d7.pdf',0,'2026-05-17 09:19:24'),(20,20,'storage/reports/project_20_e27db39d-9302-424c-a046-e4f16a3a2838.pdf',0,'2026-05-17 11:57:33'),(21,20,'storage/reports/project_20_a9bf3a13-5697-4e29-a932-5e6fa0b1e6db.pdf',0,'2026-05-17 12:06:24'),(22,20,'storage/reports/project_20_8d1febc7-49f2-430f-b74e-b834178c3dc1.pdf',0,'2026-05-18 00:20:17'),(23,20,'storage/reports/project_20_945ec2bc-7bd2-411a-ae1c-065c79820a47.pdf',0,'2026-05-18 00:36:15'),(24,20,'storage/reports/project_20_bcef4ea6-8aa4-4a77-bbd5-e3680fa334e4.pdf',0,'2026-05-18 01:49:33');
+/*!40000 ALTER TABLE `reports` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rooms`
+--
+
+DROP TABLE IF EXISTS `rooms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rooms` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `project_id` int NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `coordinates` json DEFAULT NULL,
+  `center_x` int DEFAULT NULL,
+  `center_y` int DEFAULT NULL,
+  `direction_16` varchar(50) DEFAULT NULL,
+  `direction_32` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `rooms_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rooms`
+--
+
+LOCK TABLES `rooms` WRITE;
+/*!40000 ALTER TABLE `rooms` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rooms` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rules`
+--
+
+DROP TABLE IF EXISTS `rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `entity_type` varchar(20) DEFAULT NULL,
+  `entity_name` varchar(100) DEFAULT NULL,
+  `direction_system` varchar(10) DEFAULT NULL,
+  `direction_value` varchar(50) DEFAULT NULL,
+  `result` varchar(20) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `remedy` text,
+  `color` varchar(50) DEFAULT NULL,
+  `therapy` text,
+  `ratings` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_rule_lookup` (`entity_type`,`entity_name`,`direction_system`,`direction_value`)
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rules`
+--
+
+LOCK TABLES `rules` WRITE;
+/*!40000 ALTER TABLE `rules` DISABLE KEYS */;
+INSERT INTO `rules` VALUES (1,'room','Master Bedroom','16','N','OK',NULL,NULL,'Use light colours, avoid mirror in front of bed','Light Green, Blue','Balance',5),(2,'room','Master Bedroom','16','NE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(3,'room','Master Bedroom','16','E','OK',NULL,NULL,'Use light colours, avoid mirror in front of bed','Light Green, Blue','Balance',5),(4,'room','Master Bedroom','16','SE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(5,'room','Master Bedroom','16','S','Good',NULL,NULL,'Sleep with head South, use earthy colours','Maroon, Grey','Stability',8),(6,'room','Master Bedroom','16','SW','Best',NULL,NULL,'Best location, keep heavy bed, head towards South','Beige, Brown','Grounding',10),(7,'room','Master Bedroom','16','W','Good',NULL,NULL,'Sleep with head South, use earthy colours','Maroon, Grey','Stability',8),(8,'room','Master Bedroom','16','NW','OK',NULL,NULL,'Use light colours, avoid mirror in front of bed','Light Green, Blue','Balance',5),(9,'room','Master Bedroom','16','ENE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(10,'room','Master Bedroom','16','NNE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(11,'room','Master Bedroom','16','ESE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(12,'room','Master Bedroom','16','SSE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',3),(13,'room','Master Bedroom','16','SSW','good',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',8),(14,'room','Master Bedroom','16','WSW','good',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',8),(15,'room','Master Bedroom','16','WNW','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',5),(16,'room','Master Bedroom','16','NNW','good',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','Off-white','Correction',8),(17,'room','Kitchen','16','N','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(18,'room','Kitchen','16','NE','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(19,'room','Kitchen','16','E','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(20,'room','Kitchen','16','SE','Best',NULL,NULL,'Ideal, cook facing East','Red, Orange','Fire',10),(21,'room','Kitchen','16','S','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(22,'room','Kitchen','16','SW','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(23,'room','Kitchen','16','W','ok',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',5),(24,'room','Kitchen','16','NW','Good',NULL,NULL,'Keep stove in SE corner','White, Grey','Air-fire',8),(25,'room','Kitchen','16','ENE','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(26,'room','Kitchen','16','NNE','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(27,'room','Kitchen','16','ESE','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(28,'room','Kitchen','16','SSE','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(29,'room','Kitchen','16','SSW','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(30,'room','Kitchen','16','WSW','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(31,'room','Kitchen','16','WNW','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(32,'room','Kitchen','16','NNW','Bad',NULL,NULL,'Use red bulb / गैस SE side shift','Yellow, Pink','Correction',3),(33,'room','Toilet','16','N','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(34,'room','Toilet','16','NE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(35,'room','Toilet','16','E','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(36,'room','Toilet','16','SE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(37,'room','Toilet','16','S','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(38,'room','Toilet','16','SW','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(39,'room','Toilet','16','W','Good',NULL,NULL,'Good, keep clean & ventilated','White, Grey','Air',8),(40,'room','Toilet','16','NW','Good',NULL,NULL,'Good, keep clean & ventilated','White, Grey','Air',8),(41,'room','Toilet','16','ENE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(42,'room','Toilet','16','NNE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(43,'room','Toilet','16','ESE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(44,'room','Toilet','16','SSE','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(45,'room','Toilet','16','SSW','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(46,'room','Toilet','16','WSW','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(47,'room','Toilet','16','WNW','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(48,'room','Toilet','16','NNW','Bad',NULL,NULL,'Keep door closed, use salt bowl / कपूर','Light Yellow','Correction',3),(49,'room','Living Area','16','N','Best',NULL,NULL,'Keep open & bright, add plants','Green, Blue','Positive',10),(50,'room','Living Area','16','NE','Best',NULL,NULL,'Keep open & bright, add plants','Green, Blue','Positive',10),(51,'room','Living Area','16','E','Best',NULL,NULL,'Keep open & bright, add plants','Green, Blue','Positive',10),(52,'room','Living Area','16','SE','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(53,'room','Living Area','16','S','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(54,'room','Living Area','16','SW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(55,'room','Living Area','16','W','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(56,'room','Living Area','16','NW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(57,'room','Living Area','16','ENE','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(58,'room','Living Area','16','NNE','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(59,'room','Living Area','16','ESE','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(60,'room','Living Area','16','SSE','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(61,'room','Living Area','16','SSW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(62,'room','Living Area','16','WSW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(63,'room','Living Area','16','WNW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(64,'room','Living Area','16','NNW','OK',NULL,NULL,'Use balanced décor, avoid clutter','Cream','Neutral',5),(65,'room','Dining Area','16','N','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(66,'room','Dining Area','16','NE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(67,'room','Dining Area','16','E','Good',NULL,NULL,'Eat facing East, keep mirror','Light Yellow','Health',8),(68,'room','Dining Area','16','SE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(69,'room','Dining Area','16','S','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(70,'room','Dining Area','16','SW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(71,'room','Dining Area','16','W','Good',NULL,NULL,'Eat facing East, keep mirror','Light Yellow','Health',8),(72,'room','Dining Area','16','NW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(73,'room','Dining Area','16','ENE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(74,'room','Dining Area','16','NNE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(75,'room','Dining Area','16','ESE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(76,'room','Dining Area','16','SSE','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(77,'room','Dining Area','16','SSW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(78,'room','Dining Area','16','WSW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(79,'room','Dining Area','16','WNW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(80,'room','Dining Area','16','NNW','OK',NULL,NULL,'Keep clean, use light colours','Cream','Balance',5),(81,'room','Balcony','16','N','Best',NULL,NULL,'Best, keep open & plants','Green','Prosperity',10),(82,'room','Balcony','16','NE','Best',NULL,NULL,'Best, keep open & plants','Green','Prosperity',10),(83,'room','Balcony','16','E','Best',NULL,NULL,'Best, keep open & plants','Green','Prosperity',10),(84,'room','Balcony','16','SE','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(85,'room','Balcony','16','S','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(86,'room','Balcony','16','SW','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(87,'room','Balcony','16','W','OK',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(88,'room','Balcony','16','NW','OK',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(89,'room','Balcony','16','ENE','OK',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(90,'room','Balcony','16','NNE','good',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',8),(91,'room','Balcony','16','ESE','ok',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(92,'room','Balcony','16','SSE','OK',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(93,'room','Balcony','16','SSW','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(94,'room','Balcony','16','WSW','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(95,'room','Balcony','16','WNW','bad',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',3),(96,'room','Balcony','16','NNW','OK',NULL,NULL,'Keep heavy plants / grounding','Brown','Stability',5),(97,'room','Bedroom','16','N','Bad',NULL,NULL,'Use light colours, avoid mirror in front of bed','White','Correction',3),(98,'room','Bedroom','16','NE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',3),(99,'room','Bedroom','16','E','ok',NULL,NULL,'Use light colours, avoid mirror in front of bed','White','Correction',5),(100,'room','Bedroom','16','SE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',3),(101,'room','Bedroom','16','S','Good',NULL,NULL,'Sleep with head South, use earthy colours','Grey','Calm',8),(102,'room','Bedroom','16','SW','Best',NULL,NULL,'Best location, keep heavy bed, head towards South','Beige','Stability',10),(103,'room','Bedroom','16','W','Good',NULL,NULL,'Sleep with head South, use earthy colours','Grey','Calm',8),(104,'room','Bedroom','16','NW','ok',NULL,NULL,'Use light colours, avoid mirror in front of bed','White','Correction',5),(105,'room','Bedroom','16','ENE','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',5),(106,'room','Bedroom','16','NNE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',3),(107,'room','Bedroom','16','ESE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',3),(108,'room','Bedroom','16','SSE','Bad',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',3),(109,'room','Bedroom','16','SSW','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',5),(110,'room','Bedroom','16','WSW','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',5),(111,'room','Bedroom','16','WNW','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',5),(112,'room','Bedroom','16','NNW','ok',NULL,NULL,'Avoid this zone, use salt bowl + vastu pyramid','White','Correction',5),(113,'room','Sitout','16','N','Best',NULL,NULL,'Best for seating, fresh air flow','Light Blue','Positive',10),(114,'room','Sitout','16','NE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(115,'room','Sitout','16','E','Best',NULL,NULL,'Best for seating, fresh air flow','Light Blue','Positive',10),(116,'room','Sitout','16','SE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(117,'room','Sitout','16','S','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(118,'room','Sitout','16','SW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(119,'room','Sitout','16','W','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(120,'room','Sitout','16','NW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(121,'room','Sitout','16','ENE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(122,'room','Sitout','16','NNE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(123,'room','Sitout','16','ESE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(124,'room','Sitout','16','SSE','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(125,'room','Sitout','16','SSW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(126,'room','Sitout','16','WSW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(127,'room','Sitout','16','WNW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5),(128,'room','Sitout','16','NNW','OK',NULL,NULL,'Keep light furniture, avoid clutter','White','Neutral',5);
+/*!40000 ALTER TABLE `rules` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subscriptions`
+--
+
+DROP TABLE IF EXISTS `subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subscriptions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `plan_name` varchar(100) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `reports_limit` int DEFAULT NULL,
+  `reports_used` int DEFAULT NULL,
+  `start_date` datetime DEFAULT NULL,
+  `end_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_subscriptions_user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subscriptions`
+--
+
+LOCK TABLES `subscriptions` WRITE;
+/*!40000 ALTER TABLE `subscriptions` DISABLE KEYS */;
+INSERT INTO `subscriptions` VALUES (1,2,'Pro Plan','active',20,0,'2026-05-13 18:48:47','2026-06-12 18:48:47');
+/*!40000 ALTER TABLE `subscriptions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tasks`
+--
+
+DROP TABLE IF EXISTS `tasks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tasks` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `task_id` varchar(100) NOT NULL,
+  `user_id` int NOT NULL,
+  `project_id` int NOT NULL,
+  `status` varchar(20) DEFAULT NULL,
+  `progress` float DEFAULT NULL,
+  `result_path` varchar(500) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `error` text,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ix_tasks_task_id` (`task_id`),
+  KEY `ix_tasks_status` (`status`),
+  KEY `user_id` (`user_id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `tasks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `tasks_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tasks`
+--
+
+LOCK TABLES `tasks` WRITE;
+/*!40000 ALTER TABLE `tasks` DISABLE KEYS */;
+INSERT INTO `tasks` VALUES (1,'d1a03425-d712-4d38-86ba-e75e5585d409',2,20,'COMPLETED',100,'storage/reports/project_20_d1a03425-d712-4d38-86ba-e75e5585d409.pdf',NULL,NULL,'2026-05-16 21:59:40'),(2,'43580e88-860d-456f-aab7-1cce79d67b9e',2,20,'COMPLETED',100,'storage/reports/project_20_43580e88-860d-456f-aab7-1cce79d67b9e.pdf',NULL,NULL,'2026-05-16 22:17:56'),(3,'f2063d14-499d-4166-aad5-5460fef76067',2,20,'COMPLETED',100,'storage/reports/project_20_f2063d14-499d-4166-aad5-5460fef76067.pdf',NULL,NULL,'2026-05-16 22:21:48'),(4,'6b767308-d457-495a-87d8-b318cd174615',2,20,'COMPLETED',100,'storage/reports/project_20_6b767308-d457-495a-87d8-b318cd174615.pdf',NULL,NULL,'2026-05-16 22:25:19'),(5,'8eccdb8d-513e-4d5e-a503-e134ff04f4c2',2,20,'COMPLETED',100,'storage/reports/project_20_8eccdb8d-513e-4d5e-a503-e134ff04f4c2.pdf',NULL,NULL,'2026-05-16 22:42:47'),(6,'3967aa59-11d7-4aaf-88d3-016f47265a30',2,20,'COMPLETED',100,'storage/reports/project_20_3967aa59-11d7-4aaf-88d3-016f47265a30.pdf',NULL,NULL,'2026-05-16 22:59:58'),(7,'d247f168-6f67-4733-a94b-a034f08dd999',2,20,'COMPLETED',100,'storage/reports/project_20_d247f168-6f67-4733-a94b-a034f08dd999.pdf',NULL,NULL,'2026-05-16 23:18:46'),(8,'9d26b0bf-757b-43c5-9fe2-173cbe2aae11',2,20,'COMPLETED',100,'storage/reports/project_20_9d26b0bf-757b-43c5-9fe2-173cbe2aae11.pdf',NULL,NULL,'2026-05-16 23:20:47'),(9,'c48a99a7-a448-45e1-929b-d245c8d360a9',2,20,'COMPLETED',100,'storage/reports/project_20_c48a99a7-a448-45e1-929b-d245c8d360a9.pdf',NULL,NULL,'2026-05-16 23:23:41'),(10,'9d9a4512-35d6-47eb-b8da-64169a72c4d7',2,20,'COMPLETED',100,'storage/reports/project_20_9d9a4512-35d6-47eb-b8da-64169a72c4d7.pdf',NULL,NULL,'2026-05-17 14:49:23'),(11,'e27db39d-9302-424c-a046-e4f16a3a2838',2,20,'COMPLETED',100,'storage/reports/project_20_e27db39d-9302-424c-a046-e4f16a3a2838.pdf',NULL,NULL,'2026-05-17 17:27:33'),(12,'a9bf3a13-5697-4e29-a932-5e6fa0b1e6db',2,20,'COMPLETED',100,'storage/reports/project_20_a9bf3a13-5697-4e29-a932-5e6fa0b1e6db.pdf',NULL,NULL,'2026-05-17 17:36:23'),(13,'ed82a3ad-3482-4348-83f4-a088b3f137da',2,20,'FAILED',0,NULL,NULL,NULL,'2026-05-17 17:51:56'),(14,'a9a31be7-1696-4a6d-8f11-84d198988ec3',2,20,'FAILED',0,NULL,NULL,NULL,'2026-05-17 18:15:24'),(15,'553bc599-a02d-42ff-81f5-d54dfbb5ba52',2,20,'FAILED',0,NULL,NULL,NULL,'2026-05-18 05:47:21'),(16,'8d1febc7-49f2-430f-b74e-b834178c3dc1',2,20,'COMPLETED',100,'storage/reports/project_20_8d1febc7-49f2-430f-b74e-b834178c3dc1.pdf',NULL,NULL,'2026-05-18 05:50:16'),(17,'945ec2bc-7bd2-411a-ae1c-065c79820a47',2,20,'COMPLETED',100,'storage/reports/project_20_945ec2bc-7bd2-411a-ae1c-065c79820a47.pdf',NULL,NULL,'2026-05-18 06:06:15'),(18,'bcef4ea6-8aa4-4a77-bbd5-e3680fa334e4',2,20,'COMPLETED',100,'storage/reports/project_20_bcef4ea6-8aa4-4a77-bbd5-e3680fa334e4.pdf',NULL,NULL,'2026-05-18 07:19:33');
+/*!40000 ALTER TABLE `tasks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `translations`
+--
+
+DROP TABLE IF EXISTS `translations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `translations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(50) NOT NULL,
+  `record_id` int NOT NULL,
+  `language_id` int NOT NULL,
+  `field_name` varchar(100) NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_translation` (`table_name`,`record_id`,`language_id`,`field_name`),
+  KEY `language_id` (`language_id`),
+  CONSTRAINT `translations_ibfk_1` FOREIGN KEY (`language_id`) REFERENCES `languages` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `translations`
+--
+
+LOCK TABLES `translations` WRITE;
+/*!40000 ALTER TABLE `translations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `translations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `email` varchar(150) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `header_title` varchar(255) DEFAULT NULL,
+  `header_subtitle` varchar(255) DEFAULT NULL,
+  `address` text,
+  `footer_text` text,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `phone` (`phone`),
+  KEY `ix_users_id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Administrator','admin@example.com','9999999999','$2b$12$6aOuQP5sb39vtLkxK1Vp1eCoV.H8fhI4OSzW99B62g9g44/mNRBhO',NULL,NULL,NULL,NULL,NULL,1,'admin','2026-05-13 18:48:47',NULL),(2,'Demo User','demo@test.com','8888888888','$2b$12$Q4PyuS40KQsIUsFlLXRfm.o.IZc.0.os3pQGfEli0nzls/Uhxj8bu',NULL,NULL,NULL,NULL,NULL,1,'user','2026-05-13 18:48:47','2026-05-18 01:49:16');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-05-18 13:00:19
