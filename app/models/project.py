@@ -1,6 +1,7 @@
 # app/models/project.py
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, func
 from app.db.base import Base
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, func
+
 import enum
 
 class ProjectStatus(str, enum.Enum):

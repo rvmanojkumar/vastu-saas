@@ -1,5 +1,5 @@
 # app/models/translation.py
-
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,
@@ -9,7 +9,7 @@ from sqlalchemy import (
     UniqueConstraint
 )
 
-from app.db.base import Base
+
 
 
 class Translation(Base):

@@ -1,15 +1,11 @@
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,
     String,
     ForeignKey,
-    DateTime
+    DateTime,func
 )
-
-from sqlalchemy.sql import func
-
-from app.db.base import Base
-
 
 class ReportItem(Base):
     __tablename__ = "report_items"

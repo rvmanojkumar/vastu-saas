@@ -1,3 +1,4 @@
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,
@@ -5,14 +6,9 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     DateTime,
-    UniqueConstraint
+    UniqueConstraint,
+    func
 )
-
-from sqlalchemy.sql import func
-
-from app.db.base import Base
-
-
 class ReportRule(Base):
     __tablename__ = "report_rules"
 

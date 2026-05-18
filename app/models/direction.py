@@ -1,7 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
 from app.db.base import Base
-
-
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy import (
     Column,
     Integer,
@@ -9,10 +7,6 @@ from sqlalchemy import (
     Boolean,
     Float
 )
-
-from app.db.base import Base
-
-
 class Direction(Base):
     __tablename__ = "directions"
 

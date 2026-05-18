@@ -1,5 +1,5 @@
 # app/models/generated_report.py
-
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,

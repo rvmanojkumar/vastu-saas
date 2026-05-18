@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text,Index
 from app.db.base import Base
+from sqlalchemy import Column, Integer, String, Text,Index
+
 
 class Rule(Base):
     __tablename__ = "rules"

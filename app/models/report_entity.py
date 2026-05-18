@@ -1,3 +1,4 @@
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,
@@ -6,7 +7,7 @@ from sqlalchemy import (
     Text
 )
 
-from app.db.base import Base
+
 
 
 class ReportEntity(Base):

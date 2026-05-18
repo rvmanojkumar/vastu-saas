@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean
 from app.db.base import Base
+from sqlalchemy import Column, Integer, String, Boolean
+
 
 
 class Language(Base):

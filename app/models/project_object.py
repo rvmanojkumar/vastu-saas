@@ -1,3 +1,4 @@
+from app.db.base import Base
 from sqlalchemy import (
     Column,
     Integer,
@@ -5,14 +6,9 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     DateTime,
-    JSON
+    JSON,
+    func
 )
-
-from sqlalchemy.sql import func
-
-from app.db.base import Base
-
-
 class ProjectObject(Base):
     __tablename__ = "project_objects"
 
