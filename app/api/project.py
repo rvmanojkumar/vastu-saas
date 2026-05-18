@@ -23,9 +23,9 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/")
+@router.post("")
 def create_project(
-    data: dict, 
+    data: dict,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
