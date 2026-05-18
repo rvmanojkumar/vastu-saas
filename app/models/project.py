@@ -16,6 +16,7 @@ class Project(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     name = Column(String(150))
+    client_name = Column(String(255), nullable=True)
     description = Column(Text)
     image_path = Column(String(255), nullable=True) 
     rotation = Column(Integer, default=0)

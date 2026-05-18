@@ -1,4 +1,5 @@
 from app.core.celery_app import celery
+from app.services.report.builder import build_payload
 from app.services.report.generator import generate_pdf
 from app.db.session import SessionLocal
 from app.models.project import Project
@@ -12,6 +13,8 @@ import os
 import asyncio
 import math
 import logging
+
+from app.services.report.service import get_report_context
 
 logger = logging.getLogger(__name__)
 
@@ -99,41 +102,21 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
 
         # Prepare payload
         logger.info("Preparing report payload")
-        payload = {
-            "company_name": data.get("company_name"),
-            "phone": data.get("phone"),
-            "email": data.get("email"),
-            "notes": data.get("notes", ""),
-            "project_name": project.name if project else "Unknown Project",
-            "rooms": [
-                {
-                    "name": r.name,
-                    "direction_16": safe_int(getattr(r, 'direction_16', None)),
-                    "direction_32": safe_int(getattr(r, 'direction_32', None)),
-                    "result": "good",
-                    "color": getattr(r, "color", ""),
-                    "therapy": getattr(r, "therapy", "")
-                }
-                for r in rooms
-            ],
-            "objects": [
-                {
-                    "name": o.name,
-                    "direction_16": safe_int(getattr(o, 'direction_16', None)),
-                    "result": "neutral"
-                }
-                for o in objects
-            ]
-        }
-        
-        logger.info(f"Payload prepared with {len(payload['rooms'])} rooms")
+        context = get_report_context(
+            project_id=project_id,
+            user_id=data.get("user_id"),
+            request_data=data
+        )
+
+        payload = build_payload(context)
+        formatted_payload = ' '.join(map(str, payload))
+        logger.info(f"Payload prepared with {formatted_payload}")
         update_task(db, task, "PROCESSING", 70, task_id)
 
         # Generate PDF
         logger.info("Creating storage directory")
         os.makedirs("storage/reports", exist_ok=True)
         output_file = f"storage/reports/project_{project_id}_{task_id}.pdf"
-        
         logger.info(f"Generating PDF: {output_file}")
         generate_pdf(payload, output_file)
         

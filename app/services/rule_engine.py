@@ -1,5 +1,8 @@
+from typing import List, Dict, Any
+from app.models import Polygon, Rule
+from app.core.cache import get_cached_rules, set_cached_rules
+from app.utils.direction import normalize_direction
 from sqlalchemy.orm import Session
-from app.models.rule import Rule
 
 
 def evaluate_rule(db: Session, entity_type, entity_name, direction_system, direction_value):
@@ -28,3 +31,28 @@ def evaluate_rule(db: Session, entity_type, entity_name, direction_system, direc
         "description": rule.description,
         "remedy": rule.remedy
     }
+def load_rules(db):
+
+    cached = get_cached_rules()
+    if cached:
+        return cached
+
+    rules = db.query(Rule).all()
+
+    serialized = [
+        {
+            "entity_type": r.entity_type,
+            "entity_name": r.entity_name,
+            "direction_system": r.direction_system,
+            "direction_value": r.direction_value,
+            "ratings": r.ratings,
+            "description": r.description,
+            "remedy": r.remedy,
+            "color": r.color,
+            "result": r.result
+        }
+        for r in rules
+    ]
+
+    set_cached_rules(serialized)
+    return serialized
