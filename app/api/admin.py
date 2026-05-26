@@ -12,6 +12,7 @@ from app.models.report import Report
 from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
+from app.models.rule import Rule
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -33,6 +34,32 @@ class BulkSubscriptionAssign(BaseModel):
     plan_name: str
     reports_limit: int
     duration_days: int = 30
+
+# ============= RULE SCHEMAS =============
+
+class RuleCreate(BaseModel):
+    entity_type: str
+    entity_name: str
+    direction_system: str
+    direction_value: str
+
+    result: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    remedy: Optional[str] = None
+    ratings: Optional[int] = None
+    color: Optional[str] = None
+    therapy: Optional[str] = None
+
+
+class RuleUpdate(BaseModel):
+    result: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    remedy: Optional[str] = None
+    ratings: Optional[int] = None
+    color: Optional[str] = None
+    therapy: Optional[str] = None
 
 def get_db():
     db = SessionLocal()
@@ -452,3 +479,194 @@ def get_report_usage(
         "by_plan": [{"plan": p[0], "count": p[1]} for p in reports_by_plan],
         "by_month": reports_by_month
     }
+
+# ============= RULE MANAGEMENT =============
+
+@router.get("/rules")
+def get_rules(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    search: Optional[str] = None,
+    entity_type: Optional[str] = None,
+    result: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+    
+    query = db.query(Rule)
+
+    if search:
+        query = query.filter(
+            (Rule.entity_name.ilike(f"%{search}%")) |
+            (Rule.title.ilike(f"%{search}%")) |
+            (Rule.direction_value.ilike(f"%{search}%"))
+        )
+
+    if entity_type:
+        query = query.filter(Rule.entity_type == entity_type)
+
+    if result:
+        query = query.filter(Rule.result == result)
+
+    total = query.count()
+
+    rules = query.order_by(Rule.id.desc()) \
+        .offset((page - 1) * limit) \
+        .limit(limit) \
+        .all()
+
+    return {
+        "rules": rules,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total,
+            "pages": (total + limit - 1) // limit
+        }
+    }
+
+@router.post("/rules")
+def create_rule(
+    data: RuleCreate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+
+    rule = Rule(
+        entity_type=data.entity_type,
+        entity_name=data.entity_name,
+        direction_system=data.direction_system,
+        direction_value=data.direction_value,
+
+        result=data.result,
+        title=data.title,
+        description=data.description,
+        remedy=data.remedy,
+        ratings=data.ratings,
+        color=data.color,
+        therapy=data.therapy,
+    )
+
+    db.add(rule)
+    db.commit()
+    db.refresh(rule)
+
+    return {
+        "message": "Rule created successfully",
+        "id": rule.id
+    }
+
+@router.put("/rules/{rule_id}")
+def update_rule(
+    rule_id: int,
+    data: RuleUpdate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+
+    rule = db.query(Rule).filter(
+        Rule.id == rule_id
+    ).first()
+
+    if not rule:
+        raise HTTPException(404, "Rule not found")
+
+    update_data = data.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(rule, key, value)
+
+    db.commit()
+    db.refresh(rule)
+
+    return {
+        "message": "Rule updated successfully"
+    }
+@router.delete("/rules/{rule_id}")
+def delete_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+
+    rule = db.query(Rule).filter(
+        Rule.id == rule_id
+    ).first()
+
+    if not rule:
+        raise HTTPException(404, "Rule not found")
+
+    db.delete(rule)
+    db.commit()
+
+    return {
+        "message": "Rule deleted successfully"
+    }
+
+@router.get("/rules/distinct")
+def get_distinct_entities(
+    entity_type: str = Query(...),
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    entities = db.query(Rule.entity_name).filter(
+        Rule.entity_type == entity_type
+    ).distinct().all()
+
+    return [
+    {
+        "entity_name": e[0],
+        "entity_type": entity_type
+    }
+    for e in entities
+]
+@router.get("/rules/by-entity")
+def get_rules_by_entity(
+    entity_type: str,
+    entity_name: str,
+    direction_system: str,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+
+    rules = db.query(Rule).filter(
+        Rule.entity_type == entity_type,
+        Rule.entity_name == entity_name,
+        Rule.direction_system == direction_system
+    ).all()
+
+    return [
+        {
+            "id": r.id,
+            "entity_type": r.entity_type,
+            "entity_name": r.entity_name,
+            "direction_system": r.direction_system,
+            "direction_value": r.direction_value,
+
+            "result": r.result,
+            "title": r.title,
+            "description": r.description,
+            "remedy": r.remedy,
+            "ratings": r.ratings,
+            "color": r.color,
+            "therapy": r.therapy,
+        }
+        for r in rules
+    ]
+
+#GET SINGLE RULE
+@router.get("/rules/{rule_id}")
+def get_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin)
+):
+
+    rule = db.query(Rule).filter(Rule.id == rule_id).first()
+
+    if not rule:
+        raise HTTPException(404, "Rule not found")
+
+    return rule
+
+
