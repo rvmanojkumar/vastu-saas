@@ -7,5 +7,6 @@ celery = Celery(
 )
 
 celery.conf.imports = [
-    "app.tasks.report_tasks"
+    "app.tasks.report_tasks",
+    "app.tasks.cache_tasks",
 ]

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 
@@ -278,6 +279,14 @@ tr{
     padding:8px;
     margin:auto;
 }
+.compass-section {
+    text-align: center;
+}
+
+.chart-block img {
+    max-width: 100%;
+    height: auto;
+}
 
 /* =========================================================
    ANALYSIS BOXES
@@ -340,7 +349,6 @@ tr{
 </head>
 
 <body>
-
 <div class="watermark">
     SPIRITUALHUT
 </div>
@@ -360,9 +368,7 @@ tr{
             <td class="header-left">
 
                 <div class="logo">
-                    <img
-                        src="{{ logo_url if logo_url else 'https://spiritualhutacademy.com/assets/images/spiritual.jpeg' }}"
-                        alt="Logo">
+                    <img src="{{ logo_url if logo_url else '' }}"alt="Logo">
                 </div>
 
                 <div class="brand-title">
@@ -512,6 +518,7 @@ tr{
         </tr>
 
         {% for item in ratings %}
+        {% if item.type and item.type|lower == 'room' %}
 
         <tr>
 
@@ -528,7 +535,7 @@ tr{
             </td>
 
         </tr>
-
+        {% endif %}
         {% endfor %}
 
     </table>
@@ -551,14 +558,19 @@ tr{
         Floor Plan
     </div>
 
-    <div class="chart-wrapper">
+    <div class="compass-section">
 
-        <img
-            class="chart-image"
-            src="{{ chart_url if chart_url else 'https://spiritualhutacademy.com/assets/images/chart.png' }}"
-            alt="Chart">
-
+    <div class="chart-block">
+        <h2>32 Direction Compass</h2>
+        <img src="{{ chart32_url }}" alt="32 Direction Compass" style="max-width:100%;">
     </div>
+
+    <div class="chart-block" style="margin-top: 20px;">
+        <h2>16 Direction Compass</h2>
+       <img src="{{ chart16_url }}" alt="16 Direction Compass" style="max-width:100%;">
+    </div>
+
+</div>
 
 </div>
 
@@ -583,6 +595,7 @@ tr{
         </tr>
 
         {% for room in ratings %}
+        {% if room.type and room.type|lower == 'room' %}
 
         <tr>
 
@@ -607,7 +620,7 @@ tr{
             </td>
 
         </tr>
-
+        {% endif %}
         {% endfor %}
 
     </table>

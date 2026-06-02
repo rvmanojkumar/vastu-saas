@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.report_entity import ReportEntity
 
+
 router = APIRouter(prefix="/rooms", tags=["Rooms"])
 
 def get_db():

@@ -61,3 +61,8 @@ libpangocairo-1.0-0 \
 libcairo2 \
 libffi-dev \
 shared-mime-info
+
+--
+local
+celery -A app.core.celery_app:celery worker --loglevel=info --concurrency=4
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

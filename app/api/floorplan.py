@@ -2,7 +2,7 @@ import os
 import shutil
 import json
 import math
-from typing import List, Optional
+from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Request
 from fastapi import status
 from sqlalchemy.orm import Session
@@ -23,6 +23,8 @@ from datetime import datetime
 class RoomCreate(BaseModel):
     name: str
     coordinates: List[List[float]]
+    centroid: Optional[Dict] = None
+    direction: Optional[str] = None
 
 class ObjectCreate(BaseModel):  # You might want this for objects too
     object_type: str
@@ -306,90 +308,78 @@ async def save_boundary(
 @router.post("/room/{project_id}")
 def save_room(
     project_id: int,
-    room_data: RoomCreate,  # ← Now RoomCreate is defined
+    room_data: RoomCreate,
     image_width: float = Query(...),
     image_height: float = Query(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Save a room polygon"""
-    
+
     project = db.query(Project).filter(
         Project.id == project_id,
         Project.user_id == current_user.id
     ).first()
-    
+
     if not project:
         raise HTTPException(404, "Project not found")
-    
-    # Get boundary for validation
+
     boundary = db.query(Polygon).filter(
         Polygon.project_id == project_id,
         Polygon.type == PolygonType.OUTER_BOUNDARY
     ).first()
-    
+
     if not boundary:
         raise HTTPException(400, "Please draw outer boundary first")
-    
-    # Validate minimum 3 points
+
     if len(room_data.coordinates) < 3:
         raise HTTPException(400, "Room must have at least 3 points")
-    
-    # Normalize coordinates
-    normalized_coords = normalize_coordinates(room_data.coordinates, image_width, image_height)
-    
-    # Calculate centroid
-    centroid = compute_centroid(normalized_coords)
-    
-    # Calculate direction based on centroid
-    direction = calculate_direction(
-        centroid, 
-        boundary.centroid, 
-        project.starting_degree if hasattr(project, 'starting_degree') else 0
+
+    # Keep normalized coordinates for storage
+    normalized_coords = normalize_coordinates(
+        room_data.coordinates,
+        image_width,
+        image_height
     )
-    
-    # Auto-generate color (simple hash-based)
-    import hashlib
-    hash_val = int(hashlib.md5(room_data.name.encode()).hexdigest()[:6], 16)
-    color = f"#{hash_val:06x}"
-    
-    # Create room
+    direction = room_data.direction
+
+    if direction:
+        direction = direction.split("(")[0].strip()
     room = Polygon(
         project_id=project_id,
         parent_id=boundary.id,
         type=PolygonType.ROOM,
         name=room_data.name,
         coordinates=normalized_coords,
-        centroid=centroid,
+
+        # values supplied by Flutter
+        centroid=room_data.centroid,
         direction=direction,
-        color=color
     )
+
     db.add(room)
     db.commit()
     db.refresh(room)
-    
-    # Get Vastu rule if available
+
     from app.models.rule import Rule
+
     rule = db.query(Rule).filter(
         Rule.entity_type == "room",
         Rule.entity_name == room_data.name,
         Rule.direction_value == direction
     ).first()
-    
+
     return {
         "success": True,
         "room_id": room.id,
-        "centroid": centroid,
-        "direction": direction,
-        "color": color,
+        "centroid": room_data.centroid,
+        "direction": room_data.direction,
         "rule": {
             "result": rule.result if rule else "unknown",
             "remedy": rule.remedy if rule else None,
-            "color": rule.color if rule else None,
             "therapy": rule.therapy if rule else None
         } if rule else None
     }
-
 @router.get("/rooms/{project_id}")
 def get_rooms(
     project_id: int,
@@ -428,7 +418,7 @@ def delete_room(
     ).first()
     
     if not room:
-        raise HTTPException(404, "Room not found")
+        raise HTTPException(403, "Not authorized")
     
     # Verify ownership through project
     project = db.query(Project).filter(

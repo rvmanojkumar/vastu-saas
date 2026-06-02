@@ -13,6 +13,7 @@ from app.models.direction import Direction
 from app.models.report_entity import ReportEntity
 from app.models.subscription import Subscription
 from app.models.project import Project
+from app.models.rule import Rule
 
 
 # =====================================================
@@ -33,6 +34,7 @@ TABLES_ORDER = [
     "plans",
     "directions",
     "languages",
+    "rules"
 ]
 
 
@@ -185,6 +187,9 @@ def seed():
         print("\nLogin:")
         print("Admin: admin@example.com / admin123")
         print("Demo:  demo@test.com / demo123")
+
+        
+
 
     except Exception as e:
         db.rollback()

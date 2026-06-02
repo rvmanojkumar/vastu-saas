@@ -1,3 +1,5 @@
+from matplotlib.patches import Polygon
+
 from app.core.celery_app import celery
 from app.services.report.builder import build_payload
 from app.services.report.generator import generate_pdf
@@ -7,12 +9,16 @@ from app.models.room import Room
 from app.models.object import Object
 from app.models.task import Task
 from app.models.report import Report
+from app.models.polygon import Polygon as PolygonModel
 from app.core.websocket_manager import manager
+
 
 import os
 import asyncio
 import math
 import logging
+import json
+
 
 from app.services.report.service import get_report_context
 
@@ -90,13 +96,13 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
 
         # Load rooms
         logger.info("Loading rooms")
-        rooms = db.query(Room).filter(Room.project_id == project_id).all()
+        rooms = (db.query(PolygonModel).filter(PolygonModel.project_id == project_id,PolygonModel.type == "room").all())
         logger.info(f"Found {len(rooms)} rooms")
         update_task(db, task, "PROCESSING", 50, task_id)
 
         # Load objects
         logger.info("Loading objects")
-        objects = db.query(Object).filter(Object.project_id == project_id).all()
+        objects = (db.query(PolygonModel).filter(PolygonModel.project_id == project_id,PolygonModel.type == "object").all())
         logger.info(f"Found {len(objects)} objects")
         update_task(db, task, "PROCESSING", 60, task_id)
 
@@ -109,7 +115,7 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
         )
 
         payload = build_payload(context)
-        formatted_payload = ' '.join(map(str, payload))
+        formatted_payload = json.dumps(payload, indent=2)
         logger.info(f"Payload prepared with {formatted_payload}")
         update_task(db, task, "PROCESSING", 70, task_id)
 

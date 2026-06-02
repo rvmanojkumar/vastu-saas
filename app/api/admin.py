@@ -13,6 +13,7 @@ from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
 from app.models.rule import Rule
+from app.core.cache import set_cached_rooms, set_cached_objects
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -550,11 +551,13 @@ def create_rule(
     db.add(rule)
     db.commit()
     db.refresh(rule)
-
+    refresh_rooms_cache(db)
+    refresh_objects_cache(db)
     return {
         "message": "Rule created successfully",
         "id": rule.id
     }
+
 
 @router.put("/rules/{rule_id}")
 def update_rule(
@@ -598,6 +601,8 @@ def delete_rule(
 
     db.delete(rule)
     db.commit()
+    refresh_rooms_cache(db)
+    refresh_objects_cache(db)
 
     return {
         "message": "Rule deleted successfully"
@@ -668,5 +673,30 @@ def get_rule(
         raise HTTPException(404, "Rule not found")
 
     return rule
+
+def refresh_rooms_cache(db):
+    rooms = (
+        db.query(Rule.entity_name)
+        .filter(Rule.entity_type == "room")
+        .distinct()
+        .order_by(Rule.entity_name)
+        .all()
+    )
+
+    room_list = [r[0] for r in rooms if r[0]]
+
+    set_cached_rooms(room_list)
+def refresh_objects_cache(db):
+    objects = (
+        db.query(Rule.entity_name)
+        .filter(Rule.entity_type == "object")
+        .distinct()
+        .order_by(Rule.entity_name)
+        .all()
+    )
+
+    object_list = [r[0] for r in objects if r[0]]
+
+    set_cached_objects(object_list)
 
 
