@@ -482,7 +482,7 @@ def save_object(
     #     boundary.centroid,
     #     project.starting_degree
     # )
-    direction = object_data.direction.split("(")[0].strip()
+    # direction = object_data.direction.split("(")[0].strip()
     # Find which room contains this point
     containing_room = None
     
@@ -515,7 +515,7 @@ def save_object(
         name=object_data.object_type,
         coordinates=[normalized_pos],
         centroid=normalized_pos,
-        direction=direction,
+        direction=object_data.direction,
         extra_data={"rotation": object_data.rotation}
     )
     db.add(obj)
@@ -532,13 +532,13 @@ def save_object(
     rule = db.query(Rule).filter(
         Rule.entity_type == "object",
         Rule.entity_name == object_data.object_type,
-        Rule.direction_value == direction
+        Rule.direction_value == object_data.direction
     ).first()
     
     return {
         "success": True,
         "object_id": obj.id,
-        "direction": direction,
+        "direction": obj.direction,
         "room": containing_room.name if containing_room else None,
         "room_id": containing_room.id if containing_room else None,
         "rotation": object_data.rotation,
