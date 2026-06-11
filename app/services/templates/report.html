@@ -314,6 +314,203 @@ tr{
 .remedy-list li{
     margin-bottom:5px;
 }
+/* =========================================================
+   Bar CHART
+========================================================= */
+.chart-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+  page-break-inside: avoid;
+}
+
+.chart-title {
+  font-size: 14pt;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Main Graphic Layout Wrapper */
+.chart-main-wrapper {
+  display: grid;
+  grid-template-columns: 40px 1fr; /* Strict structural split */
+  height: 250px; 
+}
+
+/* Y-Axis Layout */
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  padding-right: 10px;
+  font-size: 10pt;
+  color: #666;
+  font-weight: bold;
+  height: 100%;
+}
+
+/* Graphic Window mapping background grid + bars */
+.chart-graph-area {
+  position: relative;
+  border-left: 2px solid #444;
+  border-bottom: 2px solid #444;
+  background-color: #fafafa;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Background Grid Setup */
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.grid-line {
+  width: 100%;
+  border-top: 1px dashed #e0e0e0;
+  height: 0;
+}
+
+.grid-lines :last-child {
+  border-top: none; 
+}
+
+/* Columns container */
+.bars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row !important; /* Force layout direction horizontally across */
+  justify-content: space-around;
+  align-items: flex-end; /* Locks bars strictly to the bottom line */
+  z-index: 2;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Individual Bar Wrapper Column */
+.chart-bar-column {
+  display: block; /* Overrides any unintended flex behavior */
+  position: relative;
+  height: 100%;
+  width: 45px; 
+}
+
+/* The actual generated bar */
+.chart-bar {
+  display: block !important; /* Forces vertical block behavior */
+  width: 100%;
+  background-color: #3182ce;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  position: absolute;
+  bottom: 0; /* Forces it to grow up from the bottom */
+  text-align: center;
+}
+
+/* Numeric text value inside/on top of the bar */
+.chart-value {
+  display: block;
+  color: #ffffff;
+  font-size: 9pt;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* X-Axis Alignment Layout */
+.x-axis-wrapper {
+  display: grid;
+  grid-template-columns: 40px 1fr; /* Matches the chart grid columns precisely */
+  margin-top: 8px;
+}
+
+.y-axis-spacer {
+  width: 100%;
+}
+
+.x-axis {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.x-label {
+  width: 70px; /* Gives extra space for longer names */
+  text-align: center;
+  font-size: 9pt;
+  color: #444;
+  word-wrap: break-word;
+  white-space: normal; /* Permits wrapping instead of trailing down */
+}
+/* =========================================================
+   REMEDIES
+========================================================= */
+.remedy-advanced{
+    margin-top: 10px;
+}
+
+.remedy-section{
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #e4d8cb;
+}
+
+.remedy-heading{
+    font-size: 13px;
+    font-weight: bold;
+    color: #5b3a22;
+    margin-bottom: 10px;
+    padding-left: 6px;
+    border-left: 4px solid #c58634;
+}
+
+.remedy-block{
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+.remedy-subtitle{
+    font-size: 11px;
+    font-weight: bold;
+    color: #3a2a1d;
+    margin-bottom: 4px;
+}
+
+.remedy-block ul{
+    margin: 0;
+    padding-left: 18px;
+}
+
+.remedy-block li{
+    font-size: 10px;
+    margin-bottom: 3px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.remedy-quote{
+    font-style: italic;
+    font-size: 10px;
+    padding: 8px 10px;
+    background: #faf7f2;
+    border-left: 4px solid #c58634;
+    margin-bottom: 10px;
+    color: #444;
+}
 
 /* =========================================================
    FOOTER
@@ -543,11 +740,61 @@ tr{
 </div>
 
 </td>
-
 </tr>
-
 </table>
 
+<!--======================================================
+        BAR CHART
+
+======================================================= -->
+ <div class="chart-container">
+            <h3 class="chart-title">Room Ratings Analysis</h3>
+
+            <div class="chart-main-wrapper">
+                <div class="y-axis">
+                <div class="y-label">10</div>
+                <div class="y-label">8</div>
+                <div class="y-label">6</div>
+                <div class="y-label">4</div>
+                <div class="y-label">2</div>
+                <div class="y-label">0</div>
+                </div>
+
+                <div class="chart-graph-area">
+                <div class="grid-lines">
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                </div>
+
+                <div class="bars-container">
+                    {% for item in ratings %}
+                    {% if(item.type and item.type|lower == 'room') %}
+                    {% set percentage = item.rating * 10 %}
+                    <div class="chart-bar-column">
+                        <div class="chart-bar" {{ 'style="height: ' ~ percentage ~ '%;"' | safe }}>
+                        <span class="chart-value">{{ item.rating }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+
+            <div class="x-axis-wrapper">
+                <div class="y-axis-spacer"></div>
+                <div class="x-axis">
+                {% for item in ratings %}
+                    {% if(item.type and item.type|lower == 'room') %}
+                        <div class="x-label">{{ item.name }}</div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+            </div>
 <!-- =====================================================
      CHART
 ===================================================== -->
@@ -577,7 +824,6 @@ tr{
 <!-- =====================================================
      ROOM ANALYSIS
 ===================================================== -->
-
 <div class="card">
 
     <div class="card-title">
@@ -608,7 +854,7 @@ tr{
             </td>
 
             <td>
-                {{ room.state if room.state else 'N/A' }}
+                {{ room.status if room.status else 'N/A' }}
             </td>
 
             <td>
@@ -693,7 +939,192 @@ tr{
     </ul>
 
 </div>
+<div class="card">
 
+    <div class="card-title">
+        ADDITIONAL VASTU REMEDIES & ENERGY BALANCING GUIDELINES
+    </div>
+
+    <div class="remedy-advanced">
+
+        <!-- ========================= ENTRANCE ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">Vastu Remedies for Entrance</div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Convex Mirror</div>
+                <ul>
+                    <li>Install a convex mirror outside the main door facing outward.</li>
+                    <li>Prevents negative energy from entering the house.</li>
+                    <li>Reflects harmful vibrations away from the entrance.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Black Salt Remedy</div>
+                <ul>
+                    <li>Keep a bowl of black salt near the main entrance.</li>
+                    <li>Replace the salt every Saturday.</li>
+                    <li>Absorbs negative vibrations and stagnant energy.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Camphor Lamp</div>
+                <ul>
+                    <li>Light a camphor lamp near the main entrance every evening.</li>
+                    <li>Purifies the atmosphere and removes negativity.</li>
+                    <li>Promotes peace, harmony, and prosperity.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= COMMON ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">Common Vastu Remedies</div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Space Cleansing</div>
+                <ul>
+                    <li>Burn camphor, guggul, or loban daily.</li>
+                    <li>Helps remove negative energy and purify the environment.</li>
+                    <li>Tuesday, Thursday, and Saturday are especially effective.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Salt Remedy</div>
+                <ul>
+                    <li>Keep rock salt in a glass bowl in a corner of the house.</li>
+                    <li>Absorbs negative energy and unwanted vibrations.</li>
+                    <li>Replace every Saturday or Sunday.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Mantra Chanting</div>
+                <ul>
+                    <li>Chant “Om Namah Shivaya” or “Om Vastu Devaya Namah”.</li>
+                    <li>Hanuman Chalisa and Vishnu Sahasranama are beneficial.</li>
+                    <li>Creates positive vibrations and spiritual protection.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Flowers & Aroma</div>
+                <ul>
+                    <li>Offer fresh flowers daily in the prayer area.</li>
+                    <li>Use incense sticks, dhoop, or essential oils.</li>
+                    <li>Recommended fragrances: Sandalwood, Lavender, Rose.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Light and Fire Element</div>
+                <ul>
+                    <li>Light a ghee lamp every evening in prayer or entrance area.</li>
+                    <li>Activates the Fire Element (Agni Tattva).</li>
+                    <li>Encourages positivity, prosperity, and spiritual growth.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Clean Corners</div>
+                <ul>
+                    <li>Keep corners clean, dry, and well-lit.</li>
+                    <li>Dark and cluttered corners attract stagnant energy.</li>
+                    <li>Improves energy circulation in the home.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">Clocks & Calendars</div>
+                <ul>
+                    <li>Place clocks and calendars on North or East walls.</li>
+                    <li>Supports growth, progress, and opportunities.</li>
+                    <li>Avoid placing clocks on the South wall.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= PYRAMID ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">Pyramid Therapy & Elemental Balancing (SW & NE)</div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">South-West (SW) Cut – Earth Element</div>
+                <ul>
+                    <li>May cause instability, financial fluctuations, and low confidence.</li>
+                    <li>Install earth energy pyramids in SW zone.</li>
+                    <li>Use earthy tones like yellow, beige, cream.</li>
+                    <li>Keep SW area heavy with furniture or storage.</li>
+                    <li>Use stone, ceramic, brass or copper objects.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">North-East (NE) Cut – Water Element</div>
+                <ul>
+                    <li>May cause stress, confusion, and delayed opportunities.</li>
+                    <li>Keep NE area clean, light, and clutter-free.</li>
+                    <li>Use light colors like white, blue, cream.</li>
+                    <li>Enhance natural light and openness.</li>
+                    <li>Place crystal or clear quartz if needed.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= PYRAMID BENEFITS ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">Benefits of Pyramids</div>
+
+            <div class="remedy-block">
+                <ul>
+                    <li><b>Energy Balance:</b> Pyramids help distribute universal energy evenly.</li>
+                    <li><b>Negative Neutralization:</b> Reduces geopathic stress and negativity.</li>
+                    <li><b>Five Element Harmony:</b> Helps correct elemental imbalance in space.</li>
+                    <li><b>Brahmasthan Activation:</b> Enhances central energy flow of the house.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= MINDSET ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">Power of Positive Mindset</div>
+
+            <div class="remedy-quote">
+                “No structure is inherently inauspicious; energy depends on the people living in it.”
+            </div>
+
+            <div class="remedy-block">
+                <ul>
+                    <li>Positive thoughts create positive vibrations.</li>
+                    <li>Faith and gratitude strengthen energy of space.</li>
+                    <li>Love, peace, and respect transform a house into a temple.</li>
+                    <li>Vastu tools support energy — but mindset is the foundation.</li>
+                </ul>
+            </div>
+
+            <div class="remedy-final">
+                <b>Final Message:</b><br/>
+                Give your home the feeling of a temple.<br/><br/>
+
+                A house filled with Love, Respect, Gratitude, Peace and Positive Thoughts
+                becomes naturally balanced and prosperous.<br/><br/>
+
+                <b>True Vastu begins from within and reflects in your surroundings.</b>
+            </div>
+
+        </div>
 <!-- =====================================================
      FOOTER
 ===================================================== -->
