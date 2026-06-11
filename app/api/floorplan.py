@@ -29,6 +29,7 @@ class RoomCreate(BaseModel):
 class ObjectCreate(BaseModel):  # You might want this for objects too
     object_type: str
     position: List[float]
+    direction: str
     rotation: int = 0
     room_id: Optional[int] = None  # Add this if you want to support specifying room
 
@@ -476,12 +477,12 @@ def save_object(
     normalized_pos = [norm_x, norm_y]
     
     # Calculate direction
-    direction = calculate_direction(
-        normalized_pos,
-        boundary.centroid,
-        project.starting_degree
-    )
-    
+    # direction = calculate_direction(
+    #     normalized_pos,
+    #     boundary.centroid,
+    #     project.starting_degree
+    # )
+    direction = object_data.direction.split("(")[0].strip()
     # Find which room contains this point
     containing_room = None
     
