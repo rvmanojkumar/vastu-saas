@@ -447,8 +447,8 @@ def delete_room(
 def save_object(
     project_id: int,
     object_data: ObjectCreate,  # Use the Pydantic model
-    image_width: float = Query(...),
-    image_height: float = Query(...),
+    image_width: Optional[float] = Query(None),   # 📍 Changed to Optional so it doesn't break your current URL
+    image_height: Optional[float] = Query(None),  # 📍 Changed to Optional so it doesn't break your current URL
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -462,7 +462,7 @@ def save_object(
     if not project:
         raise HTTPException(404, "Project not found")
     
-    # Get boundary for direction calculation
+    # Get boundary for verification
     boundary = db.query(Polygon).filter(
         Polygon.project_id == project_id,
         Polygon.type == PolygonType.OUTER_BOUNDARY
@@ -471,18 +471,10 @@ def save_object(
     if not boundary:
         raise HTTPException(400, "Please draw outer boundary first")
     
-    # Normalize position
-    norm_x = object_data.position[0] / image_width
-    norm_y = object_data.position[1] / image_height
-    normalized_pos = [norm_x, norm_y]
+    # 📍 FIX 1: Directly use the coordinates from the payload. No division!
+    normalized_pos = object_data.position 
+    direction = object_data.direction
     
-    # Calculate direction
-    # direction = calculate_direction(
-    #     normalized_pos,
-    #     boundary.centroid,
-    #     project.starting_degree
-    # )
-    # direction = object_data.direction.split("(")[0].strip()
     # Find which room contains this point
     containing_room = None
     
@@ -503,6 +495,7 @@ def save_object(
         ).all()
         
         for room in rooms:
+            # 📍 This will now work perfectly because normalized_pos isn't broken
             if point_in_polygon(normalized_pos, room.coordinates):
                 containing_room = room
                 break
@@ -515,7 +508,7 @@ def save_object(
         name=object_data.object_type,
         coordinates=[normalized_pos],
         centroid=normalized_pos,
-        direction=object_data.direction,
+        direction=direction,  # 📍 Directly uses the frontend's evaluated direction
         extra_data={"rotation": object_data.rotation}
     )
     db.add(obj)
@@ -532,13 +525,13 @@ def save_object(
     rule = db.query(Rule).filter(
         Rule.entity_type == "object",
         Rule.entity_name == object_data.object_type,
-        Rule.direction_value == object_data.direction
+        Rule.direction_value == direction
     ).first()
     
     return {
         "success": True,
         "object_id": obj.id,
-        "direction": obj.direction,
+        "direction": direction,
         "room": containing_room.name if containing_room else None,
         "room_id": containing_room.id if containing_room else None,
         "rotation": object_data.rotation,
@@ -547,7 +540,6 @@ def save_object(
             "remedy": rule.remedy if rule else None
         } if rule else None
     }
-
 
 @router.get("/objects/{project_id}")
 def get_objects(
