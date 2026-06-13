@@ -1,3 +1,4 @@
+import re
 from typing import List, Dict, Any
 from app.api import rules
 from app.models import Polygon, Rule
@@ -42,105 +43,8 @@ def find_rule(rules: List[Rule], entity_type: str, entity_name: str, direction: 
 
     return None
 
-# def compute_vastu_analysis(db, project_id: int):
-
-#     from app.models import Polygon, Rule
-
-#     # =========================
-#     # FETCH DATA
-#     # =========================
-#     polygons = db.query(Polygon).filter(
-#         Polygon.project_id == project_id,
-#         Polygon.type.in_(["room", "object"])
-#     ).all()
-
-#     rules = load_rules(db)
-
-#     rows = []
-#     total = 0
-
-#     for poly in polygons:
-
-#         direction = normalize_direction(poly.direction)
-
-#         matched = None
-
-#         for rule in rules:
-#             if (
-#                 rule["entity_type"] == poly.type and
-#                 rule["entity_name"] == poly.name and
-#                 rule["direction_value"] == direction
-#             ):
-#                 matched = rule
-#                 break
-
-#         if matched:
-#             rating = matched["ratings"]
-#             analysis = matched["description"]
-#             remedy = matched["remedy"]
-#             color = matched["color"]
-#             state = matched["result"]
-#         else:
-#             rating = 0
-#             analysis = "No rule found"
-#             remedy = "Manual review required"
-#             color = "#ccc"
-#             state = "neutral"
-
-#         rows.append({
-#             "name": poly.name,
-#             "direction": direction,
-#             "rating": rating,
-#             "analysis": analysis,
-#             "remedy": remedy,
-#             "color": color,
-#             "state": state
-#         })
-
-#         total += rating
-
-#     overall = round(total / len(polygons), 2) if polygons else 0
-
-#     return {
-#         "overall": overall,
-#         "rows": rows
-#     }
-
-# def load_rules(db):
-
-#     cached = get_cached_rules()
-#     if cached:
-#         return cached
-
-#     rules = db.query(Rule).all()
-
-#     serialized = [
-#         {
-#             "entity_type": r.entity_type,
-#             "entity_name": r.entity_name,
-#             "direction_system": r.direction_system,
-#             "direction_value": r.direction_value,
-#             "ratings": r.ratings,
-#             "description": r.description,
-#             "remedy": r.remedy,
-#             "color": r.color,
-#             "result": r.result
-#         }
-#         for r in rules
-#     ]
-
-#     set_cached_rules(serialized)
-#     return serialized
 def load_rules(db):
     print("NEW LOAD_RULES RUNNING")
-    # cached = get_cached_rules()
-
-    # if False and cached:
-    #     return cached
-
-    # # Only accept the new dictionary format
-    # if cached and isinstance(cached, dict):
-    #     return cached
     print("REBUILDING RULE CACHE")
     rules = db.query(Rule).all()
 
@@ -167,11 +71,7 @@ def load_rules(db):
 
     return lookup
 
-def compute_vastu_analysis(
-    db,
-    project_id: int,
-    direction_system: str = "16"
-):
+def compute_vastu_analysis(db, project_id: int):
     from app.models import Polygon
 
     # =========================
@@ -189,15 +89,25 @@ def compute_vastu_analysis(
     rules = load_rules(db)
     rows = []
     total = 0.0
-    count =0
+    count = 0
+    
     for poly in polygons:
-
+        # 1. Normalize the direction string
         direction = normalize_direction(poly.direction)
 
+        # 2. DYNAMIC SYSTEM DETECTION
+        # If direction matches patterns like E1, S3, N8 (Letter + Number), it's a 32-system.
+        # Otherwise, default it to the 16-system.
+        if re.match(r'^[A-Za-z]+\d+$', direction.strip()):
+            determined_system = "32"
+        else:
+            determined_system = "16"
+
+        # 3. Generate the cache key using the dynamically found system
         rule_key = cache_key(
             poly.type,
             poly.name,
-            direction_system,
+            determined_system,
             direction
         )
 
@@ -224,6 +134,7 @@ def compute_vastu_analysis(
             "name": poly.name,
             "type": poly.type,
             "direction": direction,
+            "system_used": determined_system, # Added for easier UI debugging!
 
             "title": title,
             "analysis": analysis,
@@ -234,9 +145,10 @@ def compute_vastu_analysis(
             "color": color,
             "status": state,
         })
-        if(rating): 
+        if rating: 
             total += rating
             count += 1
+            
     overall = round(total / count, 2) if count > 0 else 0
 
     return {

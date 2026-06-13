@@ -624,17 +624,10 @@ tr{
 
         <tr>
 
-            <td>
+            <td colspan="2">
                 <div class="info-box">
-                    <h4>Client Name</h4>
+                    <h4>Client Details</h4>
                     <p>{{ client.name if client.name else 'N/A' }}</p>
-                </div>
-            </td>
-
-            <td>
-                <div class="info-box">
-                    <h4>Property</h4>
-                    <p>{{ property.type if property.type else 'N/A' }}</p>
                 </div>
             </td>
 
@@ -645,14 +638,14 @@ tr{
             <td>
                 <div class="info-box {{ property.entrance_class }}">
                     <h4>Main Entrance</h4>
-                    <p>{{ property.entrance if property.entrance else 'N/A' }}</p>
+                    <p>{{ property.entrance }}</p>
                 </div>
             </td>
 
             <td>
                 <div class="info-box {{ property.kitchen_class }}">
                     <h4>Kitchen</h4>
-                    <p>{{ property.kitchen if property.kitchen else 'N/A' }}</p>
+                    <p>{{ property.kitchen }}</p>
                 </div>
             </td>
 
@@ -663,7 +656,7 @@ tr{
             <td>
                 <div class="info-box {{ property.bedroom_class }}">
                     <h4>Master Bedroom</h4>
-                    <p>{{ property.master_bedroom if property.master_bedroom else 'N/A' }}</p>
+                    <p>{{ property.master_bedroom }}</p>
                 </div>
             </td>
 

@@ -18,10 +18,16 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         user = db.query(User).filter(User.id == user_id).first()
 
         client = {
-            "name": getattr(project, "client_name", "") if project else ""
+            "name": getattr(project, "description", "") if project else ""
         } if project else None
 
         analysis_data = compute_vastu_analysis(db, project_id)
+        # Create a clean, case-insensitive direction lookup map
+        analysis_rows = analysis_data.get("rows", [])
+        direction_map = {
+            row["name"].strip().lower(): row["direction"] 
+            for row in analysis_rows
+        }
 
         rooms = (db.query(PolygonModel).filter(PolygonModel.project_id == project_id,PolygonModel.type == "room").all())
         chart32 = "file://" + os.path.abspath(f"storage/projects/{project_id}/compass_32.png"
@@ -35,6 +41,10 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
             "client": client,
             "rooms": rooms,
             "ratings": analysis_data,
+            "main_entrance_direction": direction_map.get("main entrance", "Not Specified"),
+            "kitchen_direction": direction_map.get("kitchen", "Not Specified"),
+            # Or add the entire map if you need to pull other items later
+            "directions_lookup": direction_map,
             "chart32": chart32,
             "chart16": chart16,
             "request_data": request_data,
