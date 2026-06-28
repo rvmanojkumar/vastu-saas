@@ -1,5 +1,6 @@
 from app.db.base import Base
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 
 class Plan(Base):
@@ -11,3 +12,7 @@ class Plan(Base):
     duration_days = Column(Integer, nullable=False)
     report_limit = Column(Integer, nullable=False)
     is_whitelabel = Column(Boolean, default=False)
+    subscriptions = relationship(
+        "Subscription",
+        back_populates="plan"
+    )

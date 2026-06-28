@@ -20,7 +20,7 @@ def get_db():
 @router.post("/assign/{user_id}")
 def assign_subscription(
     user_id: int,
-    plan_name: str,
+    plan_id: int,
     reports_limit: int,
     duration_days: int = 30,
     db: Session = Depends(get_db),
@@ -41,7 +41,7 @@ def assign_subscription(
     # Create new subscription
     subscription = Subscription(
         user_id=user_id,
-        plan_name=plan_name,
+        plan_name=plan_id,
         status="active",
         reports_limit=reports_limit,
         reports_used=0,

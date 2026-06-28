@@ -163,3 +163,4 @@ docker-data/
 # ALEMBIC CACHE
 # =========================================================
 alembic/versions/__pycache__/
+app/api/__pycache__/

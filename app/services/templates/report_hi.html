@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+<title>{{ report_title or "SPIRITUALHUT - Vastu Report" }}</title>
+
+<style>
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+@page{
+    size:A4;
+    margin:10mm;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:10px;
+    line-height:1.45;
+    color:#2b2b2b;
+    background:#ffffff;
+}
+
+/* =========================================================
+   SAFE PDF HELPERS
+========================================================= */
+
+img{
+    max-width:100%;
+    display:block;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+tr{
+    page-break-inside:avoid;
+}
+
+.no-break{
+    page-break-inside:avoid;
+}
+
+.page-break{
+    page-break-after:always;
+}
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.watermark{
+    position:fixed;
+    top:40%;
+    left:8%;
+    transform:rotate(-30deg);
+    font-size:42px;
+    font-weight:bold;
+    color:#000000;
+    opacity:0.03;
+    z-index:-1;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container{
+    width:100%;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+    background:#5b3a22;
+    color:#ffffff;
+    border:1px solid #4b2e19;
+    border-radius:10px;
+    padding:18px;
+    margin-bottom:14px;
+}
+
+.header-table td{
+    vertical-align:top;
+}
+
+.header-left{
+    width:65%;
+}
+
+.header-right{
+    width:35%;
+    text-align:right;
+}
+
+.logo img{
+    width:60px;
+    height:60px;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.2);
+    margin-bottom:10px;
+}
+
+.brand-title{
+    font-size:24px;
+    font-weight:bold;
+    letter-spacing:1px;
+    margin-bottom:4px;
+}
+
+.brand-subtitle{
+    font-size:11px;
+    opacity:0.95;
+}
+
+.consultant-name{
+    font-size:18px;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.two-col{
+    width:100%;
+    margin-bottom:14px;
+}
+
+.two-col td{
+    width:50%;
+    vertical-align:top;
+    padding:6px;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card{
+    background:#ffffff;
+    border:1px solid #e4d8cb;
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:14px;
+}
+
+.card-title{
+    font-size:16px;
+    font-weight:bold;
+    color:#5b3a22;
+    border-bottom:1px solid #eadfd2;
+    padding-bottom:6px;
+    margin-bottom:12px;
+}
+
+/* =========================================================
+   INFO BOX
+========================================================= */
+
+.info-box{
+    background:#faf7f2;
+    border:1px solid #eadfd2;
+    border-left:5px solid #c58634;
+    border-radius:8px;
+    padding:10px;
+}
+
+.info-box h4{
+    margin:0 0 5px 0;
+    font-size:11px;
+    color:#5b3a22;
+}
+
+.info-box p{
+    margin:0;
+}
+
+.good{
+    border-left-color:#2d9b5f;
+}
+
+.warning{
+    border-left-color:#d89a2d;
+}
+
+.bad{
+    border-left-color:#d64b4b;
+}
+
+/* =========================================================
+   INFO GRID
+========================================================= */
+
+.info-grid{
+    width:100%;
+}
+
+.info-grid td{
+    width:50%;
+    padding:5px;
+    vertical-align:top;
+}
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+.score-card{
+    margin-top:12px;
+    background:#fff8ec;
+    border:1px solid #edd8aa;
+    border-radius:10px;
+    text-align:center;
+    padding:16px;
+}
+
+.score{
+    font-size:40px;
+    font-weight:bold;
+    color:#c58634;
+    line-height:1;
+    margin-bottom:6px;
+}
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+.analysis-table{
+    width:100%;
+}
+
+.analysis-table th{
+    background:#5b3a22;
+    color:#ffffff;
+    padding:7px;
+    font-size:10px;
+    text-align:left;
+}
+
+.analysis-table td{
+    border:1px solid #e4d8cb;
+    padding:7px;
+    vertical-align:top;
+    font-size:10px;
+}
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart-wrapper{
+    text-align:center;
+}
+
+.chart-image{
+    width:320px;
+    max-width:100%;
+    border:1px solid #e7d9c8;
+    border-radius:8px;
+    padding:8px;
+    margin:auto;
+}
+.compass-section {
+    text-align: center;
+}
+
+.chart-block img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* =========================================================
+   ANALYSIS BOXES
+========================================================= */
+
+.analysis-grid{
+    width:100%;
+}
+
+.analysis-grid td{
+    width:50%;
+    vertical-align:top;
+    padding:5px;
+}
+
+/* =========================================================
+   REMEDIES
+========================================================= */
+
+.remedy-list{
+    margin:0;
+    padding-left:18px;
+}
+
+.remedy-list li{
+    margin-bottom:5px;
+}
+/* =========================================================
+   Bar CHART
+========================================================= */
+.chart-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+  page-break-inside: avoid;
+}
+
+.chart-title {
+  font-size: 14pt;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Main Graphic Layout Wrapper */
+.chart-main-wrapper {
+  display: grid;
+  grid-template-columns: 40px 1fr; /* Strict structural split */
+  height: 250px; 
+}
+
+/* Y-Axis Layout */
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  padding-right: 10px;
+  font-size: 10pt;
+  color: #666;
+  font-weight: bold;
+  height: 100%;
+}
+
+/* Graphic Window mapping background grid + bars */
+.chart-graph-area {
+  position: relative;
+  border-left: 2px solid #444;
+  border-bottom: 2px solid #444;
+  background-color: #fafafa;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Background Grid Setup */
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.grid-line {
+  width: 100%;
+  border-top: 1px dashed #e0e0e0;
+  height: 0;
+}
+
+.grid-lines :last-child {
+  border-top: none; 
+}
+
+/* Columns container */
+.bars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row !important; /* Force layout direction horizontally across */
+  justify-content: space-around;
+  align-items: flex-end; /* Locks bars strictly to the bottom line */
+  z-index: 2;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Individual Bar Wrapper Column */
+.chart-bar-column {
+  display: block; /* Overrides any unintended flex behavior */
+  position: relative;
+  height: 100%;
+  width: 45px; 
+}
+
+/* The actual generated bar */
+.chart-bar {
+  display: block !important; /* Forces vertical block behavior */
+  width: 100%;
+  background-color: #3182ce;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  position: absolute;
+  bottom: 0; /* Forces it to grow up from the bottom */
+  text-align: center;
+}
+
+/* Numeric text value inside/on top of the bar */
+.chart-value {
+  display: block;
+  color: #ffffff;
+  font-size: 9pt;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* X-Axis Alignment Layout */
+.x-axis-wrapper {
+  display: grid;
+  grid-template-columns: 40px 1fr; /* Matches the chart grid columns precisely */
+  margin-top: 8px;
+}
+
+.y-axis-spacer {
+  width: 100%;
+}
+
+.x-axis {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.x-label {
+  width: 70px; /* Gives extra space for longer names */
+  text-align: center;
+  font-size: 9pt;
+  color: #444;
+  word-wrap: break-word;
+  white-space: normal; /* Permits wrapping instead of trailing down */
+}
+/* =========================================================
+   REMEDIES
+========================================================= */
+.remedy-advanced{
+    margin-top: 10px;
+}
+
+.remedy-section{
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #e4d8cb;
+}
+
+.remedy-heading{
+    font-size: 13px;
+    font-weight: bold;
+    color: #5b3a22;
+    margin-bottom: 10px;
+    padding-left: 6px;
+    border-left: 4px solid #c58634;
+}
+
+.remedy-block{
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+.remedy-subtitle{
+    font-size: 11px;
+    font-weight: bold;
+    color: #3a2a1d;
+    margin-bottom: 4px;
+}
+
+.remedy-block ul{
+    margin: 0;
+    padding-left: 18px;
+}
+
+.remedy-block li{
+    font-size: 10px;
+    margin-bottom: 3px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.remedy-quote{
+    font-style: italic;
+    font-size: 10px;
+    padding: 8px 10px;
+    background: #faf7f2;
+    border-left: 4px solid #c58634;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+    margin-top:18px;
+    background:#2b1d14;
+    color:#ffffff;
+    border-radius:10px;
+    padding:16px;
+    text-align:center;
+}
+
+.footer h3{
+    margin:0 0 6px 0;
+    font-size:16px;
+}
+
+.footer p{
+    margin:3px 0;
+}
+
+/* =========================================================
+   SMALL TEXT
+========================================================= */
+
+.small{
+    font-size:9px;
+}
+
+</style>
+</head>
+
+<body>
+<div class="watermark">
+    SPIRITUALHUT
+</div>
+
+<div class="container">
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<div class="header no-break">
+
+    <table class="header-table">
+
+        <tr>
+
+            <td class="header-left">
+
+                <div class="logo">
+                    <img src="{{ logo_url if logo_url else '' }}"alt="Logo">
+                </div>
+
+                <div class="brand-title">
+                    SPIRITUALHUT
+                </div>
+
+                <div class="brand-subtitle">
+                    Advanced Vastu Energy & Sacred Geometry Analysis
+                </div>
+
+            </td>
+
+            <td class="header-right">
+
+                <div class="small">
+                    Prepared By
+                </div>
+
+                <div class="consultant-name">
+                    {{ consultant.name if consultant.name else 'N/A' }}
+                </div>
+
+                <div>
+                    {{ consultant.title if consultant.title else 'Vastu Consultant' }}
+                </div>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+</div>
+
+<!-- =====================================================
+     TOP GRID
+===================================================== -->
+
+<table class="two-col">
+
+<tr>
+
+<!-- =====================================================
+     LEFT COLUMN
+===================================================== -->
+
+<td>
+
+<div class="card no-break">
+
+    <div class="card-title">
+        Client & Property Details
+    </div>
+
+    <table class="info-grid">
+
+        <tr>
+
+            <td colspan="2">
+                <div class="info-box">
+                    <h4>Client Details</h4>
+                    <p>{{ client.name if client.name else 'N/A' }}</p>
+                </div>
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>
+                <div class="info-box {{ property.entrance_class }}">
+                    <h4>Main Entrance</h4>
+                    <p>{{ property.entrance }}</p>
+                </div>
+            </td>
+
+            <td>
+                <div class="info-box {{ property.kitchen_class }}">
+                    <h4>Kitchen</h4>
+                    <p>{{ property.kitchen }}</p>
+                </div>
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td>
+                <div class="info-box {{ property.bedroom_class }}">
+                    <h4>Master Bedroom</h4>
+                    <p>{{ property.master_bedroom }}</p>
+                </div>
+            </td>
+
+            <td>
+                <div class="info-box {{ property.concern_class }}">
+                    <h4>Concern Area</h4>
+                    <p>{{ property.concern if property.concern else 'N/A' }}</p>
+                </div>
+            </td>
+
+        </tr>
+
+    </table>
+
+    <div class="score-card">
+
+        <div class="score">
+            {{ score.overall if score.overall else '0' }}
+        </div>
+
+        <div>
+            Overall Vastu Rating After Remedies
+        </div>
+
+    </div>
+
+</div>
+
+</td>
+
+<!-- =====================================================
+     RIGHT COLUMN
+===================================================== -->
+
+<td>
+
+<div class="card no-break">
+
+    <div class="card-title">
+        Rating Breakdown
+    </div>
+
+    <table class="analysis-table">
+
+        <tr>
+            <th>Room</th>
+            <th>Direction</th>
+            <th>Rating</th>
+        </tr>
+
+        {% for item in ratings %}
+        {% if item.type and item.type|lower == 'room' %}
+
+        <tr>
+
+            <td>
+                {{ item.name if item.name else 'N/A' }}
+            </td>
+
+            <td>
+                {{ item.direction if item.direction else 'N/A' }}
+            </td>
+
+            <td>
+                {{ item.rating if item.rating else '0' }}/10
+            </td>
+
+        </tr>
+        {% endif %}
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<!--======================================================
+        BAR CHART
+
+======================================================= -->
+ <div class="chart-container">
+            <h3 class="chart-title">Room Ratings Analysis</h3>
+
+            <div class="chart-main-wrapper">
+                <div class="y-axis">
+                <div class="y-label">10</div>
+                <div class="y-label">8</div>
+                <div class="y-label">6</div>
+                <div class="y-label">4</div>
+                <div class="y-label">2</div>
+                <div class="y-label">0</div>
+                </div>
+
+                <div class="chart-graph-area">
+                <div class="grid-lines">
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                </div>
+
+                <div class="bars-container">
+                    {% for item in ratings %}
+                    {% if(item.type and item.type|lower == 'room') %}
+                    {% set percentage = item.rating * 10 %}
+                    <div class="chart-bar-column">
+                        <div class="chart-bar" {{ 'style="height: ' ~ percentage ~ '%;"' | safe }}>
+                        <span class="chart-value">{{ item.rating }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+
+            <div class="x-axis-wrapper">
+                <div class="y-axis-spacer"></div>
+                <div class="x-axis">
+                {% for item in ratings %}
+                    {% if(item.type and item.type|lower == 'room') %}
+                        <div class="x-label">{{ item.name }}</div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+            </div>
+<!-- =====================================================
+     CHART
+===================================================== -->
+
+<div class="card no-break">
+
+    <div class="card-title">
+        Floor Plan
+    </div>
+
+    <div class="compass-section">
+
+    <div class="chart-block">
+        <h2>32 Direction Compass</h2>
+        <img src="{{ chart32_url }}" alt="32 Direction Compass" style="max-width:100%;">
+    </div>
+
+    <div class="chart-block" style="margin-top: 20px;">
+        <h2>16 Direction Compass</h2>
+       <img src="{{ chart16_url }}" alt="16 Direction Compass" style="max-width:100%;">
+    </div>
+
+</div>
+
+</div>
+
+<!-- =====================================================
+     ROOM ANALYSIS
+===================================================== -->
+<div class="card">
+
+    <div class="card-title">
+        Room Wise Analysis
+    </div>
+
+    <table class="analysis-table">
+
+        <tr>
+            <th>Room</th>
+            <th>Direction</th>
+            <th>Status</th>
+            <th>Color</th>
+            <th>Remedy</th>
+        </tr>
+
+        {% for room in ratings %}
+        {% if room.type and room.type|lower == 'room' %}
+
+        <tr>
+
+            <td>
+                {{ room.name if room.name else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.direction if room.direction else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.status if room.status else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.color if room.color else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.remedy if room.remedy else 'N/A' }}
+            </td>
+
+        </tr>
+        {% endif %}
+        {% endfor %}
+
+    </table>
+
+</div>
+
+<!-- =====================================================
+     DETAILED ANALYSIS
+===================================================== -->
+
+<div class="card">
+
+    <div class="card-title">
+        Detailed Vastu Analysis
+    </div>
+
+    <table class="analysis-grid">
+
+        {% for item in ratings %}
+
+        <tr>
+
+            <td>
+
+                <div class="info-box {{ item.state }}">
+
+                    <h4>
+                        {{ item.name }} - {{ item.direction }}
+                    </h4>
+
+                    <p>
+                        {{ item.analysis if item.analysis else 'No analysis available.' }}
+                    </p>
+
+                </div>
+
+            </td>
+
+            {% if loop.index % 2 == 0 %}
+            </tr><tr>
+            {% endif %}
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+<!-- =====================================================
+     REMEDIES
+===================================================== -->
+
+<div class="card">
+
+    <div class="card-title">
+        Suggested Remedies
+    </div>
+
+    <ul class="remedy-list">
+
+        {% for item in ratings %}
+
+        <li>
+            <strong>{{ item.name }}:</strong>
+            {{ item.remedy if item.remedy else 'No remedy available.' }}
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+<div class="card">
+
+    <div class="card-title">
+        अतिरिक्त वास्तु उपाय एवं ऊर्जा संतुलन दिशानिर्देश
+    </div>
+
+    <div class="remedy-advanced">
+
+        <!-- ========================= ENTRANCE ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">मुख्य प्रवेश द्वार के लिए वास्तु उपाय</div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">उत्तल दर्पण</div>
+                <ul>
+                    <li>मुख्य प्रवेश द्वार के बाहर, बाहर की ओर मुख करके एक उत्तल दर्पण लगाएँ।</li>
+                    <li>यह नकारात्मक ऊर्जा को घर में प्रवेश करने से रोकता है।</li>
+                    <li>हानिकारक कंपन (Negative Vibrations) को प्रवेश द्वार से दूर परावर्तित करता है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">काला नमक उपाय</div>
+                <ul>
+                    <li>मुख्य प्रवेश द्वार के पास एक कटोरी में काला नमक रखें।</li>
+                    <li>प्रत्येक शनिवार को नमक बदलें।</li>
+                    <li>यह नकारात्मक कंपन एवं रुकी हुई नकारात्मक ऊर्जा को अवशोषित करता है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">कपूर दीप</div>
+                <ul>
+                    <li>प्रतिदिन संध्या समय मुख्य प्रवेश द्वार के पास कपूर का दीपक जलाएँ।</li>
+                    <li>इससे वातावरण शुद्ध होता है तथा नकारात्मकता दूर होती है।</li>
+                    <li>घर में शांति, सामंजस्य एवं समृद्धि बढ़ती है।</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= COMMON ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">सामान्य वास्तु उपाय</div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">स्थान की शुद्धि</div>
+                <ul>
+                    <li>प्रतिदिन कपूर, गुग्गुल या लोबान जलाएँ।</li>
+                    <li>इससे नकारात्मक ऊर्जा दूर होती है तथा वातावरण शुद्ध होता है।</li>
+                    <li>मंगलवार, गुरुवार और शनिवार इसके लिए विशेष रूप से शुभ माने जाते हैं।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">नमक उपाय</div>
+                <ul>
+                    <li>घर के किसी कोने में काँच की कटोरी में सेंधा नमक रखें।</li>
+                    <li>यह नकारात्मक ऊर्जा एवं अवांछित कंपन को अवशोषित करता है।</li>
+                    <li>प्रत्येक शनिवार या रविवार को नमक बदलें।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">मंत्र जाप</div>
+                <ul>
+                    <li>"ॐ नमः शिवाय" अथवा "ॐ वास्तु देवाय नमः" मंत्र का जाप करें।</li>
+                    <li>हनुमान चालीसा एवं विष्णु सहस्रनाम का पाठ भी लाभदायक है।</li>
+                    <li>इससे सकारात्मक ऊर्जा उत्पन्न होती है तथा आध्यात्मिक सुरक्षा प्राप्त होती है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">पुष्प एवं सुगंध</div>
+                <ul>
+                    <li>प्रतिदिन पूजा स्थल पर ताजे फूल अर्पित करें।</li>
+                    <li>अगरबत्ती, धूप अथवा आवश्यक सुगंधित तेल (Essential Oils) का उपयोग करें।</li>
+                    <li>चंदन, लैवेंडर एवं गुलाब की सुगंध विशेष रूप से लाभकारी मानी जाती है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">प्रकाश एवं अग्नि तत्व</div>
+                <ul>
+                    <li>प्रतिदिन संध्या समय पूजा स्थान या मुख्य प्रवेश द्वार पर घी का दीपक जलाएँ।</li>
+                    <li>इससे अग्नि तत्व (Agni Tattva) सक्रिय होता है।</li>
+                    <li>यह सकारात्मकता, समृद्धि एवं आध्यात्मिक उन्नति को बढ़ावा देता है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">कोनों को स्वच्छ रखें </div>
+                <ul>
+                    <li>घर के सभी कोनों को स्वच्छ, सूखा एवं प्रकाशयुक्त रखें।</li>
+                    <li>अंधेरे एवं अव्यवस्थित कोने स्थिर एवं नकारात्मक ऊर्जा को आकर्षित करते हैं।</li>
+                    <li>स्वच्छ कोनों से घर में ऊर्जा का प्रवाह बेहतर होता है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-block">
+                <div class="remedy-subtitle">घड़ी एवं कैलेंडर</div>
+                <ul>
+                    <li>घड़ी एवं कैलेंडर उत्तर या पूर्व दिशा की दीवार पर लगाएँ।</li>
+                    <li>इससे प्रगति, विकास एवं नए अवसरों को बढ़ावा मिलता है।</li>
+                    <li>दक्षिण दिशा की दीवार पर घड़ी लगाने से बचें।</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ========================= MINDSET ========================= -->
+        <div class="remedy-section">
+
+            <div class="remedy-heading">सकारात्मक सोच की शक्ति</div>
+
+            <div class="remedy-quote">
+                "कोई भी भवन अपने आप में अशुभ नहीं होता; उसकी ऊर्जा वहाँ रहने वाले लोगों पर निर्भर करती है।"
+            </div>
+
+            <div class="remedy-block">
+                <ul>
+                    <li>सकारात्मक विचार सकारात्मक ऊर्जा उत्पन्न करते हैं।</li>
+                    <li>श्रद्धा एवं कृतज्ञता स्थान की ऊर्जा को सशक्त बनाती हैं।</li>
+                    <li>प्रेम, शांति एवं परस्पर सम्मान किसी भी घर को मंदिर के समान पवित्र बना देते हैं।</li>
+                    <li>वास्तु उपाय ऊर्जा को संतुलित करने में सहायक होते हैं, लेकिन सकारात्मक सोच ही उसकी वास्तविक नींव है।</li>
+                </ul>
+            </div>
+
+            <div class="remedy-final">
+                <b>अंतिम संदेश</b><br/>
+                अपने घर को मंदिर जैसा पवित्र अनुभव दें।<br/><br/>
+
+                जिस घर में प्रेम, सम्मान, कृतज्ञता, शांति और सकारात्मक विचारों का वास होता है, वह घर स्वाभाविक रूप से संतुलित, सुखी एवं समृद्ध बन जाता है।<br/><br/>
+
+                <b>सच्चा वास्तु हमारे भीतर से प्रारंभ होता है और उसका प्रभाव हमारे आसपास के वातावरण में दिखाई देता है।</b>
+            </div>
+
+        </div>
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<div class="footer">
+
+    <h3>
+        SPIRITUALHUT
+    </h3>
+
+    <p>
+        {{ footer.note if footer.note else 'Generated by Vastu SaaS Engine' }}
+    </p>
+
+    <p>
+        © SpiritualHut • Sacred Geometry & Vastu Diagnostics
+    </p>
+
+</div>
+
+</div>
+
+</body>
+</html>

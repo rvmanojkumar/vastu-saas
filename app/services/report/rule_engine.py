@@ -59,8 +59,12 @@ def load_rules(db):
 )
         lookup[key] = {
             "title": r.title,
-            "description": r.description,
-            "remedy": r.remedy,
+            "description_en": r.description_en,
+            "description_mr": r.description_mr,
+            "description_hi": r.description_hi,
+            "remedy_en": r.remedy_en,
+            "remedy_mr": r.remedy_mr,
+            "remedy_hi": r.remedy_hi,
             "therapy": r.therapy,
             "ratings": float(r.ratings or 0),
             "color": r.color,
@@ -71,7 +75,7 @@ def load_rules(db):
 
     return lookup
 
-def compute_vastu_analysis(db, project_id: int):
+def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
     from app.models import Polygon
 
     # =========================
@@ -115,8 +119,8 @@ def compute_vastu_analysis(db, project_id: int):
 
         if matched:
             rating = float(matched.get("ratings", 0))
-            analysis = matched.get("description") or ""
-            remedy = matched.get("remedy") or ""
+            analysis = matched.get(f"description_{lang}") or ""
+            remedy   = matched.get(f"remedy_{lang}") or ""
             therapy = matched.get("therapy") or ""
             title = matched.get("title") or ""
             color = matched.get("color") or "#ccc"

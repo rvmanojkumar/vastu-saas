@@ -2,7 +2,7 @@ from matplotlib.patches import Polygon
 
 from app.core.celery_app import celery
 from app.services.report.builder import build_payload
-from app.services.report.generator import generate_pdf
+from app.services.report.generator import generate_pdf, generate_docx
 from app.db.session import SessionLocal
 from app.models.project import Project
 from app.models.room import Room
@@ -106,6 +106,12 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
         logger.info(f"Found {len(objects)} objects")
         update_task(db, task, "PROCESSING", 60, task_id)
 
+        lang = data.get("lang", "en")       # Default to 'en'
+        file_format = data.get("file_format", "pdf")     # Default to 'pdf'
+        report_type = data.get("report_type", "summary") # Default to 'summary'
+
+        logger.info(f"Report Config -> Lang: {lang}, Format: {file_format}, Type: {report_type}")
+
         # Prepare payload
         logger.info("Preparing report payload")
         context = get_report_context(
@@ -122,10 +128,16 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
         # Generate PDF
         logger.info("Creating storage directory")
         os.makedirs("storage/reports", exist_ok=True)
-        output_file = f"storage/reports/project_{project_id}_{task_id}.pdf"
-        logger.info(f"Generating PDF: {output_file}")
-        generate_pdf(payload, output_file)
-        
+        ext = "docx" if file_format == "doc" else file_format
+        output_file = f"storage/reports/project_{project_id}_{task_id}.{ext}"
+        logger.info(f"Generating {file_format.upper()}: {output_file}")
+        if file_format == 'pdf':
+            generate_pdf(payload, output_file)
+        elif file_format == 'doc':
+            generate_docx(payload, output_file, project_id)
+        else:
+            # It is good practice to handle unsupported formats to avoid silent failures
+            raise ValueError(f"Unsupported file format: {file_format}")
         # Check if PDF was created
         if os.path.exists(output_file):
             file_size = os.path.getsize(output_file)

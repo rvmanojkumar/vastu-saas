@@ -1,6 +1,6 @@
 # app/api/reports.py
 import uuid
-from typing import List, Optional
+from typing import List, Optional,Literal
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field, validator
@@ -9,6 +9,7 @@ from app.db.session import SessionLocal
 from app.models.task import Task
 from app.models.user import User
 from app.models.project import Project
+from app.models.language import Language
 from app.core.security import get_current_user
 from app.services.subscription import check_subscription
 from app.tasks.report_tasks import generate_report_task
@@ -55,6 +56,8 @@ class ReportGenerateRequest(BaseModel):
     logo: Optional[str] = Field(None, description="Base64 encoded logo or URL")
     watermark: Optional[str] = None
     notes: Optional[str] = Field(None, max_length=1000)
+    lang: Literal["en", "hi", "mr"] = "en"  # Add your supported languages
+    reportType: Literal["pdf", "doc"] = "pdf"
     
     @validator('cropPolygonPoints')
     def validate_crop_polygon(cls, v, values):
@@ -139,7 +142,7 @@ def generate_report(
     if not project:
         logger.warning(f"Project {project_id} not found or not owned by user {current_user.id}")
         raise HTTPException(
-            status_code=404, 
+            status_code=403, 
             detail="Project not found or you don't have access"
         )
     
@@ -147,7 +150,7 @@ def generate_report(
     # This prevents unnecessary task creation
     if not request.rooms:
         raise HTTPException(
-            status_code=400,
+            status_code=401,
             detail="At least one room is required to generate a report"
         )
     
@@ -186,6 +189,7 @@ def generate_report(
     report_data["project_name"] = project.name
     report_data["user_id"] = current_user.id
     report_data["user_email"] = current_user.email
+    report_data["file_format"] = request.reportType
     
     # Start async task
     try:
@@ -353,3 +357,18 @@ def download_report(
             "Content-Disposition": f"attachment; filename=vastu_report_project_{report.project_id}.pdf"
         }
     )
+
+# =============================================================
+# LANGUAGE DROPDOWN FOR REPORT
+# =============================================================
+
+@router.get("/languages")
+def get_languages(db: Session = Depends(get_db)):
+    """
+    Fetch all active languages to populate the report generation dropdown.
+    """
+    languages = db.query(Language).filter(Language.is_active == True).all()
+    return [
+        {"code": lang.code, "name": lang.name, "is_default": lang.is_default} 
+        for lang in languages
+    ]

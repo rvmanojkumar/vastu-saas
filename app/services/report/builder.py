@@ -10,6 +10,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
     chart16 = context.get("chart16")
     request_data = context.get("request_data", {})
     sp_logo_url = context.get("sp_logo_url", "")
+    lang =  context.get("lang", "en")
 
     # Raw room polygons (kept for backward compatibility if needed)
     rooms = context.get("rooms", [])
@@ -85,6 +86,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
         "logo_url": request_data.get("logo_url", sp_logo_url),
         "chart32_url": chart32,
         "chart16_url": chart16,
+        "lang":lang,
 
         # ================= FOOTER =================
         "footer": {

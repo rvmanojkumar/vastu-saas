@@ -24,8 +24,12 @@ class Rule(Base):
     result = Column(String(20))
 
     title = Column(String(255))
-    description = Column(Text)
-    remedy = Column(Text)
+    description_en = Column(Text)
+    description_mr = Column(Text, nullable=True)  # ← add
+    description_hi = Column(Text, nullable=True)  # ← add
+    remedy_en = Column(Text)
+    remedy_mr = Column(Text, nullable=True)        # ← add
+    remedy_hi = Column(Text, nullable=True)       
 
     ratings = ratings = Column(Numeric(3, 1), default=0)
 

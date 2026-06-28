@@ -17,6 +17,8 @@ from app.core.security import (
     get_current_user
 
 )
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -44,7 +46,7 @@ class TokenResponse(BaseModel):
 class SubscriptionStatusResponse(BaseModel):
     has_subscription: bool
     is_active: bool
-    plan_name: Optional[str]
+    plan_id: Optional[int]
     reports_limit: Optional[int]
     reports_used: Optional[int]
     remaining_reports: Optional[int]
@@ -52,6 +54,7 @@ class SubscriptionStatusResponse(BaseModel):
     can_create_project: bool
     can_generate_report: bool
     message: str
+    whitelabel:bool
 
 def get_db():
     db = SessionLocal()
@@ -131,31 +134,32 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
     )
 
 @router.post("/refresh")
-def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
-    """Get new access token using refresh token"""
-    
+def refresh_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     try:
-        from app.core.security import jwt, ALGORITHM, SECRET_KEY
-        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(request.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = payload.get("sub")
         token_type: str = payload.get("type")
-        
+
         if user_id is None or token_type != "refresh":
             raise HTTPException(401, "Invalid refresh token")
-        
-        # Check if user still exists and is active
+
         user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
         if not user:
             raise HTTPException(401, "User not found or inactive")
-        
-        # Create new access token
+
         new_access_token = create_access_token(data={"sub": user.id})
-        
-        return {"access_token": new_access_token, "token_type": "bearer"}
-        
+        new_refresh_token = create_refresh_token(data={"sub": user.id})  # rotate refresh token too
+
+        return {
+            "access_token": new_access_token,
+            "refresh_token": new_refresh_token,  # Flutter should store this new one
+            "token_type": "bearer"
+        }
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(401, "Refresh token has expired, please login again")
     except:
         raise HTTPException(401, "Invalid refresh token")
-
 @router.get("/me")
 def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current logged-in user information"""
@@ -188,19 +192,21 @@ def get_subscription_status(
         Subscription.status == "active",
         Subscription.end_date > datetime.utcnow()
     ).first()
-    
+    whitelabel_status = subscription.plan.is_whitelabel if subscription and subscription.plan else False
     if not subscription:
         return SubscriptionStatusResponse(
             has_subscription=False,
             is_active=False,
-            plan_name=None,
+            plan_id=None,
             reports_limit=None,
             reports_used=None,
             remaining_reports=None,
             expires_on=None,
             can_create_project=False,
             can_generate_report=False,
-            message="No active subscription. Please purchase a plan to create projects and generate reports."
+            message="No active subscription. Please purchase a plan to create projects and generate reports.",
+            is_whitelabel=whitelabel_status
+            
         )
     
     remaining = subscription.reports_limit - subscription.reports_used
@@ -216,18 +222,19 @@ def get_subscription_status(
         message = "You have exhausted your report limit. Please upgrade your plan."
     elif remaining <= 3:
         message = f"Warning: Only {remaining} reports remaining. Consider upgrading."
-    
+    whitelabel_status = subscription.plan.is_whitelabel if subscription and subscription.plan else False
     return SubscriptionStatusResponse(
         has_subscription=True,
         is_active=True,
-        plan_name=subscription.plan_name,
+        plan_id=subscription.plan_id,
         reports_limit=subscription.reports_limit,
         reports_used=subscription.reports_used,
         remaining_reports=remaining,
         expires_on=subscription.end_date,
         can_create_project=can_create,
         can_generate_report=can_generate,
-        message=message
+        message=message,
+        whitelabel=whitelabel_status,
     )
 
 @router.post("/logout")

@@ -14,6 +14,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
 
     try:
         # ================= CORE ENTITIES =================
+        lang = request_data.get("lang", "en") 
         project = db.query(Project).filter(Project.id == project_id).first()
         user = db.query(User).filter(User.id == user_id).first()
 
@@ -21,7 +22,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
             "name": getattr(project, "description", "") if project else ""
         } if project else None
 
-        analysis_data = compute_vastu_analysis(db, project_id)
+        analysis_data = compute_vastu_analysis(db, project_id,lang=lang)
         # Create a clean, case-insensitive direction lookup map
         analysis_rows = analysis_data.get("rows", [])
         direction_map = {
@@ -39,6 +40,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
             "project": project,
             "user": user,
             "client": client,
+            "lang": lang,
             "rooms": rooms,
             "ratings": analysis_data,
             "main_entrance_direction": direction_map.get("main entrance", "Not Specified"),

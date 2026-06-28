@@ -377,7 +377,7 @@ def save_room(
         "direction": room_data.direction,
         "rule": {
             "result": rule.result if rule else "unknown",
-            "remedy": rule.remedy if rule else None,
+            "remedy": rule.remedy_en if rule else None,
             "therapy": rule.therapy if rule else None
         } if rule else None
     }
@@ -537,7 +537,7 @@ def save_object(
         "rotation": object_data.rotation,
         "rule": {
             "result": rule.result if rule else "unknown",
-            "remedy": rule.remedy if rule else None
+            "remedy": rule.remedy_en if rule else None
         } if rule else None
     }
 

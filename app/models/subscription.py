@@ -1,5 +1,7 @@
+from sqlalchemy.orm import relationship
+
 from app.db.base import Base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from datetime import datetime
 
 
@@ -9,7 +11,7 @@ class Subscription(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, index=True)
 
-    plan_name = Column(String(100)) 
+    plan_id = Column(Integer, ForeignKey("plans.id"), nullable=False)
     status = Column(String(50), default="active")
 
     reports_limit = Column(Integer, default=10)
@@ -17,3 +19,4 @@ class Subscription(Base):
 
     start_date = Column(DateTime, default=datetime.utcnow)
     end_date = Column(DateTime, nullable=True)
+    plan = relationship("Plan", back_populates="subscriptions")
