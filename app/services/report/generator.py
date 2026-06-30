@@ -11,9 +11,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from docxtpl import InlineImage
-from docx.shared import Inches  # Ensure Inches is imported
-
-
+from docx.shared import Inches,Emu
+from docx import Document as DocxDocument
 
 # =========================
 # SAFE HELPERS
@@ -172,11 +171,11 @@ def generate_docx(data, file_path, project_id):
             raise FileNotFoundError(f"compass_32.png not found: {chart32_path}")
         if not os.path.exists(chart16_path):
             raise FileNotFoundError(f"compass_16.png not found: {chart16_path}")
-
-        data['chart32'] = InlineImage(doc, chart32_path, width=Inches(7.4), height=Inches(5.6))
-        data['chart16'] = InlineImage(doc, chart16_path, width=Inches(7.4), height=Inches(5.6))
+        usable = get_usable_width_emu(TEMPLATE_PATH)
+        img_width = Emu(int(usable * 0.85))
+        data['chart32'] = InlineImage(doc, chart32_path, width=img_width)
+        data['chart16'] = InlineImage(doc, chart16_path, width=img_width)
         print("CHART IMAGES LOADED")
-
         data['bar_chart'] = make_bar_chart_image(data['ratings'], doc)
         print("BAR CHART GENERATED")
 
@@ -232,3 +231,7 @@ def make_bar_chart_image(ratings, tpl):
     plt.close(fig)
     buf.seek(0)
     return InlineImage(tpl, buf, width=Mm(140))
+def get_usable_width_emu(template_path):
+    d = DocxDocument(template_path)
+    sec = d.sections[0]
+    return sec.page_width - sec.left_margin - sec.right_margin
