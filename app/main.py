@@ -26,6 +26,7 @@ from app.api.payment import router as payment_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.admin import router as admin_router
 from app.api.floorplan import router as floorplan_router
+from app.api.plan import router as plans_router
 import os
 os.makedirs("logs", exist_ok=True)
 app = FastAPI()
@@ -49,6 +50,7 @@ app.include_router(admin_router)  # ADD THIS - Admin management
 app.include_router(ws_router)
 app.include_router(tasks_router)
 app.include_router(floorplan_router)
+app.include_router(plans_router)
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
 @app.get("/")
@@ -61,5 +63,6 @@ def root():
             "subscriptions": "/api/subscriptions",
             "projects": "/projects",
             "reports": "/reports",
+            "plans": "/plans"
         }
     }

@@ -12,6 +12,7 @@ from app.models.report import Report
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.rule import Rule
+from app.models.task import Task
 from app.models.subscription import Subscription
 from app.models.floorplan import ProjectImage,CanvasState
 from datetime import datetime
@@ -210,11 +211,28 @@ async def delete_floorplan_image(
     
     # Store file path before deletion
     file_path = image.image_path.lstrip('/') if image.image_path else None
-    
+    task = db.query(Task).filter(
+    Task.project_id == project_id,
+    Task.progress == 100
+    ).first()
+
+    if task:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot remove image. A report has already been generated for this project."
+        )
     try:
         # Start a transaction
         # Delete all polygons (this will cascade to child objects if relationships exist)
-        db.query(Polygon).filter(Polygon.project_id == project_id).delete()
+        
+        db.query(Polygon).filter(
+            Polygon.project_id == project_id,
+            Polygon.parent_id != None
+            ).delete()
+        db.query(Polygon).filter(
+            Polygon.project_id == project_id,
+            Polygon.parent_id == None
+            ).delete()
         
         # Delete canvas state
         db.query(CanvasState).filter(CanvasState.project_id == project_id).delete()
@@ -253,6 +271,7 @@ async def delete_floorplan_image(
         logger.error(f"Unexpected error: {str(e)}", exc_info=True)
         db.rollback()
         raise HTTPException(500, f"Error deleting image: {str(e)}")
+
 @router.post("/{project_id}/upload-compass")
 async def upload_compass_image(
     project_id: int,
