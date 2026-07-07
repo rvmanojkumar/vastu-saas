@@ -5,6 +5,8 @@ from app import db
 from app.db.session import SessionLocal
 from app.models import Project, User, Room, project, user
 from app.models.polygon import Polygon as PolygonModel
+from app.models.subscription import Subscription
+from app.models.plan import Plan
 from app.services.report.rule_engine import compute_vastu_analysis
 import os
 
@@ -17,6 +19,10 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         lang = request_data.get("lang", "en") 
         project = db.query(Project).filter(Project.id == project_id).first()
         user = db.query(User).filter(User.id == user_id).first()
+        subscription = db.query(Subscription).filter(Subscription.user_id == user_id).first()
+        plan = None
+        if subscription:
+            plan = db.query(Plan).filter(Plan.id == subscription.plan_id).first()
 
         client = {
             "name": getattr(project, "description", "") if project else ""
@@ -39,6 +45,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         return {
             "project": project,
             "user": user,
+            "plan": plan,
             "client": client,
             "lang": lang,
             "rooms": rooms,

@@ -5,6 +5,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
 
     project = context.get("project")
     user = context.get("user")
+    plan = context.get("plan")
     client = context.get("client")
     chart32 = context.get("chart32")
     chart16 = context.get("chart16")
@@ -24,6 +25,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
         # ================= CONSULTANT =================
+        "is_whitelabel": bool(getattr(plan, "is_whitelabel", False)),
         "consultant": {
             "name": getattr(user, "full_name", "Dr. Amrutha Amberkar") if user else "",
             "title": getattr(user, "role", "Phd. Vastu Consultant") if user else ""
