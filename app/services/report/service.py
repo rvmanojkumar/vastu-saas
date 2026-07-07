@@ -4,6 +4,7 @@ from redis import client
 from app import db
 from app.db.session import SessionLocal
 from app.models import Project, User, Room, project, user
+from app.models import plan
 from app.models.polygon import Polygon as PolygonModel
 from app.models.subscription import Subscription
 from app.models.plan import Plan
@@ -15,6 +16,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
     db = SessionLocal()
 
     try:
+       
         # ================= CORE ENTITIES =================
         lang = request_data.get("lang", "en") 
         project = db.query(Project).filter(Project.id == project_id).first()
@@ -23,7 +25,6 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         plan = None
         if subscription:
             plan = db.query(Plan).filter(Plan.id == subscription.plan_id).first()
-
         client = {
             "name": getattr(project, "description", "") if project else ""
         } if project else None

@@ -25,7 +25,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
         # ================= CONSULTANT =================
-        "is_whitelabel": bool(plan.is_whitelabel),
+        "is_whitelabel": bool(int(plan.is_whitelabel)),
         "consultant": {
             "name": getattr(user, "full_name", "Dr. Amrutha Amberkar") if user else "",
             "title": getattr(user, "role", "Phd. Vastu Consultant") if user else ""
