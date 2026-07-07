@@ -63,6 +63,12 @@ libffi-dev \
 shared-mime-info
 
 --
+Network     Card Number                    Expiry Date              CVV
+Visa        4100 2800 0000 1007             Any future date.      Any random number
+Mastercard  5500 6700 0000 1002             Any future date       Any random number
+RuPay       6527 6589 0000 1005             Any future date.      Any random number
+Diners      3608 2800 0910 07.              Any future date       Any random number
+Amex        3402 5600 0401 007              Any future date.      Any random number
 local
 celery -A app.core.celery_app:celery worker --loglevel=info --concurrency=4
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

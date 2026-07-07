@@ -1,3 +1,4 @@
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, Numeric, Text
 from app.db.base import Base
 class Plan(Base):
@@ -12,3 +13,4 @@ class Plan(Base):
     features = Column(Text, nullable=True)
     is_whitelabel = Column(Integer, default=False)
     report_limit = Column(Integer, nullable=True)
+    subscriptions = relationship("Subscription", back_populates="plan")

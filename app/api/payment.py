@@ -1,4 +1,3 @@
-
 import os
 import uuid
 import logging
@@ -17,18 +16,21 @@ from app.models.payment import Payment, PaymentStatus
 from app.models.subscription import Subscription
 from app.models.user import User as UserModel
 from app.core.security import get_current_user  # <-- adjust if your dependency has a different name
- 
-load_dotenv()
+
+load_dotenv(override=True)
 logger = logging.getLogger(__name__)
  
 router = APIRouter(prefix="/payments", tags=["Payments"])
- 
-RAZORPAY_KEY_ID = os.getenv("RazorPay_KEY_ID")
-RAZORPAY_KEY_SECRET = os.getenv("RazorPay_KEY_SECRET")
- 
-client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
- 
- 
+
+
+def _get_razorpay_client():
+    """Always read credentials fresh from env to avoid stale module-level values."""
+    key_id = os.getenv("RazorPay_KEY_ID")
+    key_secret = os.getenv("RazorPay_KEY_SECRET")
+    if not key_id or not key_secret:
+        raise HTTPException(status_code=500, detail="Razorpay credentials not configured")
+    return razorpay.Client(auth=(key_id, key_secret)), key_id
+
 def get_db():
     db = SessionLocal()
     try:
@@ -62,6 +64,8 @@ def create_order(
     The amount is ALWAYS derived from the plan on the server —
     never trust an amount sent by the client.
     """
+    client, key_id = _get_razorpay_client()
+
     plan = db.query(Plan).filter(Plan.id == body.plan_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
@@ -106,7 +110,7 @@ def create_order(
         "order_id": order["id"],
         "amount": amount_paise,   # paise — what Razorpay checkout expects
         "currency": "INR",
-        "key": RAZORPAY_KEY_ID,   # safe to expose, it's the public Key ID
+        "key": key_id,   # safe to expose, it's the public Key ID
         "plan_name": plan.name,
     }
  
@@ -125,6 +129,8 @@ def verify_payment(
     success callback alone — this recomputation is what actually confirms
     the payment is genuine.
     """
+    client, _ = _get_razorpay_client()
+
     payment = db.query(Payment).filter(
         Payment.razorpay_order_id == body.razorpay_order_id,
         Payment.user_id == current_user.id,
@@ -174,7 +180,6 @@ def verify_payment(
     subscription = Subscription(
         user_id=current_user.id,
         plan_id=payment.plan_id,
-        plan_name=payment.plan_name,
         status="active",
         reports_limit=payment.report_limit,
         reports_used=0,
@@ -189,7 +194,7 @@ def verify_payment(
         "message": "Payment verified and subscription activated",
         "status": "paid",
         "subscription": {
-            "plan_name": subscription.plan_name,
+            "plan_id": subscription.plan_id,
             "start_date": subscription.start_date,
             "end_date": subscription.end_date,
             "reports_limit": subscription.reports_limit,
