@@ -41,7 +41,7 @@ class RoomData(BaseModel):
 class ReportGenerateRequest(BaseModel):
     # Required fields
     rooms: List[RoomData] = Field(..., min_items=1, description="At least one room required")
-    startingDegree: int = Field(..., ge=0, lt=360, description="North direction offset")
+    startingDegree: int = Field(..., ge=0, le=360, description="North direction offset")
     
     # Optional fields with defaults
     imageRotationAngle: int = Field(0, ge=0, lt=360)
