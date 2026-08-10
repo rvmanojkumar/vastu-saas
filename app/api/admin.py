@@ -13,7 +13,7 @@ from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
 from app.models.rule import Rule
-from app.core.cache import set_cached_rooms, set_cached_objects
+from app.core.cache import set_cached_rooms, set_cached_objects, invalidate_rules_cache
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -46,9 +46,13 @@ class RuleCreate(BaseModel):
 
     result: Optional[str] = None
     title: Optional[str] = None
-    description: Optional[str] = None
-    remedy: Optional[str] = None
-    ratings: Optional[int] = None
+    description_en: Optional[str] = None
+    description_hi: Optional[str] = None
+    description_mr: Optional[str] = None
+    remedy_en: Optional[str] = None
+    remedy_hi: Optional[str] = None
+    remedy_mr: Optional[str] = None
+    ratings: Optional[float] = None
     color: Optional[str] = None
     therapy: Optional[str] = None
 
@@ -56,9 +60,13 @@ class RuleCreate(BaseModel):
 class RuleUpdate(BaseModel):
     result: Optional[str] = None
     title: Optional[str] = None
-    description: Optional[str] = None
-    remedy: Optional[str] = None
-    ratings: Optional[int] = None
+    description_en: Optional[str] = None
+    description_hi: Optional[str] = None
+    description_mr: Optional[str] = None
+    remedy_en: Optional[str] = None
+    remedy_hi: Optional[str] = None
+    remedy_mr: Optional[str] = None
+    ratings: Optional[float] = None
     color: Optional[str] = None
     therapy: Optional[str] = None
 
@@ -541,8 +549,12 @@ def create_rule(
 
         result=data.result,
         title=data.title,
-        description=data.description,
-        remedy=data.remedy,
+        description_en=data.description_en,
+        description_hi=data.description_hi,
+        description_mr=data.description_mr,
+        remedy_en=data.remedy_en,
+        remedy_hi=data.remedy_hi,
+        remedy_mr=data.remedy_mr,
         ratings=data.ratings,
         color=data.color,
         therapy=data.therapy,
@@ -553,6 +565,7 @@ def create_rule(
     db.refresh(rule)
     refresh_rooms_cache(db)
     refresh_objects_cache(db)
+    invalidate_rules_cache()
     return {
         "message": "Rule created successfully",
         "id": rule.id
@@ -581,6 +594,7 @@ def update_rule(
 
     db.commit()
     db.refresh(rule)
+    invalidate_rules_cache()
 
     return {
         "message": "Rule updated successfully"
@@ -603,6 +617,7 @@ def delete_rule(
     db.commit()
     refresh_rooms_cache(db)
     refresh_objects_cache(db)
+    invalidate_rules_cache()
 
     return {
         "message": "Rule deleted successfully"
@@ -650,9 +665,13 @@ def get_rules_by_entity(
 
             "result": r.result,
             "title": r.title,
-            "description": r.description,
-            "remedy": r.remedy,
-            "ratings": r.ratings,
+            "description_en": r.description_en,
+            "description_hi": r.description_hi,
+            "description_mr": r.description_mr,
+            "remedy_en": r.remedy_en,
+            "remedy_hi": r.remedy_hi,
+            "remedy_mr": r.remedy_mr,
+            "ratings": float(r.ratings) if r.ratings is not None else None,
             "color": r.color,
             "therapy": r.therapy,
         }
