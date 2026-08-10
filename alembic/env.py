@@ -27,6 +27,8 @@ import app.models.generated_report
 import app.models.report_item
 import app.models.floorplan
 import app.models.polygon
+import app.models.promocode
+import app.models.payment
 
 
 config = context.config

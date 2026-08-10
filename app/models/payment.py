@@ -1,7 +1,7 @@
 import enum
 from sqlalchemy import (
     Column, BigInteger, String, Numeric, Integer, Enum, JSON, Text, DateTime
-)
+)  # Integer used for promocode_id
 from sqlalchemy.sql import func
 from app.db.base import Base  # <-- adjust if your Base lives elsewhere
  
@@ -30,6 +30,8 @@ class Payment(Base):
     report_limit = Column(Integer, nullable=False)
     is_whitelabel = Column(Integer, nullable=True, default=0)
     amount = Column(Numeric(10, 2), nullable=False)
+    promocode_id = Column(Integer, nullable=True)
+    discount_applied = Column(Numeric(10, 2), nullable=True)
     currency = Column(String(3), nullable=True, default="INR")
     gateway = Column(Enum(PaymentGateway), nullable=True, default=PaymentGateway.razorpay)
     transaction_reference = Column(String(100), nullable=False)

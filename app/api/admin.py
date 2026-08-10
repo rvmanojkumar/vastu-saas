@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from decimal import Decimal
 from typing import Optional, List
 from pydantic import BaseModel
+from sqlalchemy.orm import joinedload
 from app.db.session import SessionLocal
 from app.models.user import User
 from app.models.subscription import Subscription
@@ -13,6 +15,8 @@ from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
 from app.models.rule import Rule
+from app.models.plan import Plan
+from app.models.promocode import Promocode
 from app.core.cache import set_cached_rooms, set_cached_objects, invalidate_rules_cache
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
@@ -69,6 +73,27 @@ class RuleUpdate(BaseModel):
     ratings: Optional[float] = None
     color: Optional[str] = None
     therapy: Optional[str] = None
+
+
+class PromocodeCreate(BaseModel):
+    code: str
+    plan_id: int
+    discount_type: str  # percentage | amount
+    discount_value: float
+    max_usage: int
+    ends_on: date
+    status: str = "active"
+
+
+class PromocodeUpdate(BaseModel):
+    code: Optional[str] = None
+    plan_id: Optional[int] = None
+    discount_type: Optional[str] = None
+    discount_value: Optional[float] = None
+    max_usage: Optional[int] = None
+    ends_on: Optional[date] = None
+    status: Optional[str] = None
+
 
 def get_db():
     db = SessionLocal()
@@ -717,5 +742,193 @@ def refresh_objects_cache(db):
     object_list = [r[0] for r in objects if r[0]]
 
     set_cached_objects(object_list)
+
+
+# ============= PROMOCODES =============
+
+def _serialize_promocode(p: Promocode) -> dict:
+    plan_name = p.plan.name if p.plan else None
+    return {
+        "id": p.id,
+        "code": p.code,
+        "plan_id": p.plan_id,
+        "plan_name": plan_name,
+        "discount_type": p.discount_type,
+        "discount_value": float(p.discount_value) if p.discount_value is not None else None,
+        "max_usage": p.max_usage,
+        "used_count": p.used_count,
+        "ends_on": p.ends_on.isoformat() if p.ends_on else None,
+        "status": p.status,
+        "created_at": p.created_at.isoformat() if p.created_at else None,
+        "updated_at": p.updated_at.isoformat() if p.updated_at else None,
+    }
+
+
+def _validate_promo_payload(
+    discount_type: str,
+    discount_value: float,
+    max_usage: int,
+    status: str,
+    plan_id: int,
+    db: Session,
+):
+    dtype = (discount_type or "").lower().strip()
+    if dtype not in ("percentage", "amount"):
+        raise HTTPException(400, "discount_type must be 'percentage' or 'amount'")
+
+    if discount_value is None or float(discount_value) <= 0:
+        raise HTTPException(400, "discount_value must be greater than 0")
+
+    if dtype == "percentage" and float(discount_value) >= 100:
+        raise HTTPException(400, "percentage discount must be less than 100")
+
+    if max_usage is None or int(max_usage) < 1:
+        raise HTTPException(400, "max_usage must be at least 1")
+
+    st = (status or "").lower().strip()
+    if st not in ("active", "inactive"):
+        raise HTTPException(400, "status must be 'active' or 'inactive'")
+
+    plan = db.query(Plan).filter(Plan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+
+    return dtype, st
+
+
+@router.get("/promocodes")
+def list_promocodes(
+    status: Optional[str] = None,
+    plan_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    query = db.query(Promocode).options(joinedload(Promocode.plan))
+    if status:
+        query = query.filter(Promocode.status == status.lower().strip())
+    if plan_id:
+        query = query.filter(Promocode.plan_id == plan_id)
+    promos = query.order_by(Promocode.id.desc()).all()
+    return [_serialize_promocode(p) for p in promos]
+
+
+@router.post("/promocodes")
+def create_promocode(
+    data: PromocodeCreate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    dtype, st = _validate_promo_payload(
+        data.discount_type,
+        data.discount_value,
+        data.max_usage,
+        data.status,
+        data.plan_id,
+        db,
+    )
+    code = (data.code or "").strip().upper()
+    if not code:
+        raise HTTPException(400, "code is required")
+
+    exists = db.query(Promocode).filter(Promocode.code == code).first()
+    if exists:
+        raise HTTPException(400, "Promocode already exists")
+
+    promo = Promocode(
+        code=code,
+        plan_id=data.plan_id,
+        discount_type=dtype,
+        discount_value=Decimal(str(data.discount_value)),
+        max_usage=int(data.max_usage),
+        used_count=0,
+        ends_on=data.ends_on,
+        status=st,
+    )
+    db.add(promo)
+    db.commit()
+    promo = (
+        db.query(Promocode)
+        .options(joinedload(Promocode.plan))
+        .filter(Promocode.id == promo.id)
+        .first()
+    )
+    return {"message": "Promocode created", "promocode": _serialize_promocode(promo)}
+
+
+@router.put("/promocodes/{promo_id}")
+def update_promocode(
+    promo_id: int,
+    data: PromocodeUpdate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    promo = db.query(Promocode).filter(Promocode.id == promo_id).first()
+    if not promo:
+        raise HTTPException(404, "Promocode not found")
+
+    payload = data.dict(exclude_unset=True)
+
+    plan_id = payload.get("plan_id", promo.plan_id)
+    discount_type = payload.get("discount_type", promo.discount_type)
+    discount_value = float(
+        payload.get("discount_value", promo.discount_value)
+    )
+    max_usage = int(payload.get("max_usage", promo.max_usage))
+    status = payload.get("status", promo.status)
+
+    dtype, st = _validate_promo_payload(
+        discount_type, discount_value, max_usage, status, plan_id, db
+    )
+
+    if "code" in payload:
+        code = (payload["code"] or "").strip().upper()
+        if not code:
+            raise HTTPException(400, "code is required")
+        exists = (
+            db.query(Promocode)
+            .filter(Promocode.code == code, Promocode.id != promo_id)
+            .first()
+        )
+        if exists:
+            raise HTTPException(400, "Promocode already exists")
+        promo.code = code
+
+    promo.plan_id = plan_id
+    promo.discount_type = dtype
+    promo.discount_value = Decimal(str(discount_value))
+    promo.max_usage = max_usage
+    promo.status = st
+    if "ends_on" in payload:
+        promo.ends_on = payload["ends_on"]
+
+    if promo.max_usage < promo.used_count:
+        raise HTTPException(
+            400, "max_usage cannot be less than current used_count"
+        )
+
+    db.commit()
+    promo = (
+        db.query(Promocode)
+        .options(joinedload(Promocode.plan))
+        .filter(Promocode.id == promo.id)
+        .first()
+    )
+    return {"message": "Promocode updated", "promocode": _serialize_promocode(promo)}
+
+
+@router.delete("/promocodes/{promo_id}")
+def delete_promocode(
+    promo_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    promo = db.query(Promocode).filter(Promocode.id == promo_id).first()
+    if not promo:
+        raise HTTPException(404, "Promocode not found")
+
+    # Soft-delete: deactivate so payment history stays valid
+    promo.status = "inactive"
+    db.commit()
+    return {"message": "Promocode deactivated"}
 
 
