@@ -18,7 +18,6 @@ from app.models.subscription import Subscription
 from app.models.promocode import Promocode
 from app.models.user import User as UserModel
 from app.core.security import get_current_user
-from app.services.subscription import quotas_from_plan
 from app.services.promocode import (
     plan_base_amount,
     validate_promocode_for_plan,
@@ -244,24 +243,12 @@ def verify_payment(
         Subscription.status == "active",
     ).update({"status": "expired"})
 
-    plan = db.query(Plan).filter(Plan.id == payment.plan_id).first()
-    access, vastu_limit, numerology_limit = quotas_from_plan(plan) if plan else (
-        "both",
-        payment.report_limit or 0,
-        0,
-    )
-
     subscription = Subscription(
         user_id=current_user.id,
         plan_id=payment.plan_id,
         status="active",
-        reports_limit=vastu_limit if access != "numerology" else (payment.report_limit or 0),
+        reports_limit=payment.report_limit or 0,
         reports_used=0,
-        vastu_reports_limit=vastu_limit,
-        vastu_reports_used=0,
-        numerology_reports_limit=numerology_limit,
-        numerology_reports_used=0,
-        product_access=access,
         start_date=datetime.utcnow(),
         end_date=datetime.utcnow() + timedelta(days=payment.duration_days),
     )
@@ -276,9 +263,6 @@ def verify_payment(
             "plan_id": subscription.plan_id,
             "start_date": subscription.start_date,
             "end_date": subscription.end_date,
-            "product_access": subscription.product_access,
             "reports_limit": subscription.reports_limit,
-            "vastu_reports_limit": subscription.vastu_reports_limit,
-            "numerology_reports_limit": subscription.numerology_reports_limit,
         },
     }
