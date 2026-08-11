@@ -1,3 +1,5 @@
+import os
+import re
 import logging
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -14,6 +16,12 @@ from app.models.project import Project
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
+
+def _safe_download_basename(name: str, fallback: str = "vastu_report") -> str:
+    cleaned = re.sub(r"[^\w\s\-]+", "", (name or "").strip(), flags=re.UNICODE)
+    cleaned = re.sub(r"\s+", "_", cleaned).strip("._")
+    return cleaned[:80] if cleaned else fallback
+
 # ============================================================
 # PYDANTIC MODELS
 # ============================================================
@@ -28,6 +36,8 @@ class TaskStatusResponse(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     project_id: Optional[int] = None
+    project_name: Optional[str] = None
+    download_filename: Optional[str] = None
 
 class TaskListResponse(BaseModel):
     success: bool
@@ -93,7 +103,16 @@ def get_task_status(
     
     # Get project info if needed
     project = db.query(Project).filter(Project.id == task.project_id).first()
-    
+    project_name = project.name if project else None
+
+    download_filename = None
+    if task.result_path:
+        ext = os.path.splitext(task.result_path)[1] or ".pdf"
+        base = _safe_download_basename(
+            project_name or f"project_{task.project_id}"
+        )
+        download_filename = f"{base}{ext}"
+
     return TaskStatusResponse(
         success=True,
         task_id=task.task_id,
@@ -103,7 +122,9 @@ def get_task_status(
         error=getattr(task, 'error', None),
         created_at=task.created_at.isoformat() if task.created_at else None,
         updated_at=task.updated_at.isoformat() if task.updated_at else None,
-        project_id=task.project_id
+        project_id=task.project_id,
+        project_name=project_name,
+        download_filename=download_filename,
     )
 
 

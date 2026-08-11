@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
+from app.models.rule import Rule
+from app.models.plan import Plan
+from app.models.promocode import Promocode
+from app.models.payment import Payment, PaymentStatus
+from app.core.cache import set_cached_rooms, set_cached_objects, invalidate_rules_cache
+from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from typing import Optional, List
 from pydantic import BaseModel
-from sqlalchemy.orm import joinedload
 from app.db.session import SessionLocal
 from app.models.user import User
 from app.models.subscription import Subscription
@@ -14,10 +19,6 @@ from app.models.report import Report
 from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
-from app.models.rule import Rule
-from app.models.plan import Plan
-from app.models.promocode import Promocode
-from app.core.cache import set_cached_rooms, set_cached_objects, invalidate_rules_cache
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -173,38 +174,83 @@ def get_all_users(
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin)
 ):
-    """Get all users with pagination and filters"""
-    
+    """Get all users with package, payment, promocode, and report usage."""
+
     query = db.query(User)
-    
-    # Apply filters
+
     if search:
         query = query.filter(
             (User.name.ilike(f"%{search}%")) |
             (User.email.ilike(f"%{search}%")) |
             (User.phone.ilike(f"%{search}%"))
         )
-    
+
     if role:
         query = query.filter(User.role == role)
-    
+
     if is_active is not None:
         query = query.filter(User.is_active == is_active)
-    
-    # Get total count
+
     total = query.count()
-    
-    # Apply pagination
-    users = query.order_by(User.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
-    
-    # Get subscription info for each user
+    users = (
+        query.order_by(User.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
     result = []
     for user in users:
-        subscription = db.query(Subscription).filter(
-            Subscription.user_id == user.id,
-            Subscription.status == "active"
-        ).first()
-        
+        subscription = (
+            db.query(Subscription)
+            .options(joinedload(Subscription.plan))
+            .filter(
+                Subscription.user_id == user.id,
+                Subscription.status == "active",
+            )
+            .order_by(Subscription.id.desc())
+            .first()
+        )
+
+        # Latest successful payment (for amount + promocode)
+        payment = (
+            db.query(Payment)
+            .filter(
+                Payment.user_id == user.id,
+                Payment.status == PaymentStatus.paid,
+            )
+            .order_by(Payment.paid_at.desc(), Payment.id.desc())
+            .first()
+        )
+
+        promo_code = None
+        if payment and payment.promocode_id:
+            promo = (
+                db.query(Promocode)
+                .filter(Promocode.id == payment.promocode_id)
+                .first()
+            )
+            promo_code = promo.code if promo else None
+
+        plan_name = None
+        if subscription and subscription.plan:
+            plan_name = subscription.plan.name
+        elif payment:
+            plan_name = payment.plan_name
+
+        reports_generated = (
+            db.query(func.count(Report.id))
+            .join(Project, Project.id == Report.project_id)
+            .filter(Project.user_id == user.id)
+            .scalar()
+            or 0
+        )
+
+        # Prefer subscription usage counter when present (quota tracker)
+        reports_used = (
+            subscription.reports_used if subscription else reports_generated
+        )
+
         result.append({
             "id": user.id,
             "name": user.name,
@@ -214,16 +260,33 @@ def get_all_users(
             "is_active": user.is_active,
             "created_at": user.created_at,
             "last_login": user.last_login,
+            "plan_name": plan_name,
+            "amount_paid": float(payment.amount) if payment and payment.amount is not None else None,
+            "promocode": promo_code,
+            "reports_generated": int(reports_generated),
+            "reports_used": int(reports_used or 0),
+            "reports_limit": int(subscription.reports_limit) if subscription else 0,
             "subscription": {
-                "has_active": subscription is not None,
-                "plan_name": subscription.plan_name if subscription else None,
-                "reports_limit": subscription.reports_limit if subscription else 0,
-                "reports_used": subscription.reports_used if subscription else 0,
-                "remaining": (subscription.reports_limit - subscription.reports_used) if subscription else 0,
-                "expires_on": subscription.end_date if subscription else None
-            } if subscription else None
+                "has_active": True,
+                "plan_id": subscription.plan_id,
+                "plan_name": plan_name,
+                "reports_limit": subscription.reports_limit,
+                "reports_used": subscription.reports_used,
+                "remaining": (subscription.reports_limit or 0) - (subscription.reports_used or 0),
+                "expires_on": subscription.end_date,
+                "status": subscription.status,
+            } if subscription else None,
+            "payment": {
+                "id": payment.id,
+                "plan_name": payment.plan_name,
+                "amount": float(payment.amount) if payment.amount is not None else None,
+                "discount_applied": float(payment.discount_applied) if payment.discount_applied is not None else None,
+                "promocode": promo_code,
+                "paid_at": payment.paid_at,
+                "status": payment.status.value if payment.status else None,
+            } if payment else None,
         })
-    
+
     return {
         "users": result,
         "pagination": {

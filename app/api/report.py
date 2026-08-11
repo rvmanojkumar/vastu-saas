@@ -1,5 +1,6 @@
 # app/api/reports.py
 import uuid
+import re
 from typing import List, Optional,Literal
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
@@ -19,6 +20,12 @@ import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/reports", tags=["Reports"])
+
+
+def _safe_download_basename(name: str, fallback: str = "vastu_report") -> str:
+    cleaned = re.sub(r"[^\w\s\-]+", "", (name or "").strip(), flags=re.UNICODE)
+    cleaned = re.sub(r"\s+", "_", cleaned).strip("._")
+    return cleaned[:80] if cleaned else fallback
 
 # ============================================================
 # PYDANTIC MODELS (Request/Response Schemas)
@@ -154,8 +161,8 @@ def generate_report(
             detail="At least one room is required to generate a report"
         )
     
-    # Subscription check
-    allowed, subscription_info = check_subscription(db, current_user.id)
+    # Subscription check (Vastu product quota)
+    allowed, subscription_info = check_subscription(db, current_user.id, product="vastu")
     
     if not allowed:
         logger.warning(f"User {current_user.id} has no active subscription")
@@ -347,14 +354,23 @@ def download_report(
     # Check if file exists
     if not os.path.exists(report.pdf_path):
         raise HTTPException(status_code=404, detail="Report file not found")
-    
+
+    ext = os.path.splitext(report.pdf_path)[1] or ".pdf"
+    base = _safe_download_basename(project.name or f"project_{project.id}")
+    download_name = f"{base}{ext}"
+    media_type = (
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        if ext.lower() in (".doc", ".docx")
+        else "application/pdf"
+    )
+
     # Return file for download
     return FileResponse(
         path=report.pdf_path,
-        filename=f"vastu_report_project_{report.project_id}.pdf",
-        media_type="application/pdf",
+        filename=download_name,
+        media_type=media_type,
         headers={
-            "Content-Disposition": f"attachment; filename=vastu_report_project_{report.project_id}.pdf"
+            "Content-Disposition": f'attachment; filename="{download_name}"'
         }
     )
 
