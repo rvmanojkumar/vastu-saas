@@ -11,6 +11,7 @@ from app.models.task import Task
 from app.models.report import Report
 from app.models.polygon import Polygon as PolygonModel
 from app.core.websocket_manager import manager
+from app.services.subscription import increment_usage
 
 
 import os
@@ -158,6 +159,21 @@ def generate_report_task(task_id: str, project_id: int, data: dict):
         db.add(report)
         db.commit()
         logger.info(f"Report record saved with ID: {report.id}")
+
+        # Increment subscription usage after successful generation
+        user_id = data.get("user_id") or getattr(task, "user_id", None)
+        if user_id:
+            try:
+                incremented = increment_usage(db, user_id, product="vastu")
+                logger.info(
+                    f"Subscription usage increment for user {user_id}: {incremented}"
+                )
+            except Exception as usage_error:
+                logger.error(
+                    f"Failed to increment usage for user {user_id}: {usage_error}"
+                )
+        else:
+            logger.warning("No user_id available to increment report usage")
 
         # Complete task
         logger.info("Marking task as COMPLETED")
