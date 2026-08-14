@@ -45,6 +45,12 @@ def find_rule(rules: List[Rule], entity_type: str, entity_name: str, direction: 
 
 def load_rules(db):
     print("NEW LOAD_RULES RUNNING")
+    cached = get_cached_rules()
+    if isinstance(cached, dict) and cached:
+        sample = next(iter(cached.values()), {})
+        if isinstance(sample, dict) and "sug_remedy_en" in sample:
+            return cached
+
     print("REBUILDING RULE CACHE")
     rules = db.query(Rule).all()
 
@@ -65,6 +71,9 @@ def load_rules(db):
             "remedy_en": r.remedy_en,
             "remedy_mr": r.remedy_mr,
             "remedy_hi": r.remedy_hi,
+            "sug_remedy_en": r.sug_remedy_en,
+            "sug_remedy_hi": r.sug_remedy_hi,
+            "sug_remedy_mr": r.sug_remedy_mr,
             "therapy": r.therapy,
             "ratings": float(r.ratings or 0),
             "color": r.color,
@@ -121,6 +130,7 @@ def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
             rating = float(matched.get("ratings", 0))
             analysis = matched.get(f"description_{lang}") or ""
             remedy   = matched.get(f"remedy_{lang}") or ""
+            sug_remedy = matched.get(f"sug_remedy_{lang}") or matched.get("sug_remedy_en") or ""
             therapy = matched.get("therapy") or ""
             title = matched.get("title") or ""
             color = matched.get("color") or "#ccc"
@@ -130,6 +140,7 @@ def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
             title = ""
             analysis = "No rule found"
             remedy = "Manual review required"
+            sug_remedy = ""
             therapy = ""
             color = "#ccc"
             state = "neutral"
@@ -143,6 +154,7 @@ def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
             "title": title,
             "analysis": analysis,
             "remedy": remedy,
+            "sug_remedy": sug_remedy,
             "therapy": therapy,
 
             "rating": rating,

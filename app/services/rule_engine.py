@@ -48,6 +48,9 @@ def load_rules(db):
             "ratings": r.ratings,
             "description": r.description,
             "remedy": r.remedy,
+            "sug_remedy_en": r.sug_remedy_en,
+            "sug_remedy_hi": r.sug_remedy_hi,
+            "sug_remedy_mr": r.sug_remedy_mr,
             "color": r.color,
             "result": r.result
         }

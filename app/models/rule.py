@@ -29,7 +29,10 @@ class Rule(Base):
     description_hi = Column(Text, nullable=True)  # ← add
     remedy_en = Column(Text)
     remedy_mr = Column(Text, nullable=True)        # ← add
-    remedy_hi = Column(Text, nullable=True)       
+    remedy_hi = Column(Text, nullable=True)
+    sug_remedy_en = Column(Text, nullable=True)
+    sug_remedy_hi = Column(Text, nullable=True)
+    sug_remedy_mr = Column(Text, nullable=True)
 
     ratings = ratings = Column(Numeric(3, 1), default=0)
 

@@ -73,6 +73,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
                 "status": row.get("status", row.get("state", "")),
                 "color": row.get("color", ""),
                 "remedy": row.get("remedy", ""),
+                "sug_remedy": row.get("sug_remedy", ""),
                 "description": row.get("description", ""),
                 "therapy": row.get("therapy", ""),
                 "rating": row.get("rating", 0),

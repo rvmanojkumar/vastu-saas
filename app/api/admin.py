@@ -57,6 +57,9 @@ class RuleCreate(BaseModel):
     remedy_en: Optional[str] = None
     remedy_hi: Optional[str] = None
     remedy_mr: Optional[str] = None
+    sug_remedy_en: Optional[str] = None
+    sug_remedy_hi: Optional[str] = None
+    sug_remedy_mr: Optional[str] = None
     ratings: Optional[float] = None
     color: Optional[str] = None
     therapy: Optional[str] = None
@@ -71,6 +74,9 @@ class RuleUpdate(BaseModel):
     remedy_en: Optional[str] = None
     remedy_hi: Optional[str] = None
     remedy_mr: Optional[str] = None
+    sug_remedy_en: Optional[str] = None
+    sug_remedy_hi: Optional[str] = None
+    sug_remedy_mr: Optional[str] = None
     ratings: Optional[float] = None
     color: Optional[str] = None
     therapy: Optional[str] = None
@@ -643,6 +649,9 @@ def create_rule(
         remedy_en=data.remedy_en,
         remedy_hi=data.remedy_hi,
         remedy_mr=data.remedy_mr,
+        sug_remedy_en=data.sug_remedy_en,
+        sug_remedy_hi=data.sug_remedy_hi,
+        sug_remedy_mr=data.sug_remedy_mr,
         ratings=data.ratings,
         color=data.color,
         therapy=data.therapy,
@@ -759,6 +768,9 @@ def get_rules_by_entity(
             "remedy_en": r.remedy_en,
             "remedy_hi": r.remedy_hi,
             "remedy_mr": r.remedy_mr,
+            "sug_remedy_en": r.sug_remedy_en,
+            "sug_remedy_hi": r.sug_remedy_hi,
+            "sug_remedy_mr": r.sug_remedy_mr,
             "ratings": float(r.ratings) if r.ratings is not None else None,
             "color": r.color,
             "therapy": r.therapy,
