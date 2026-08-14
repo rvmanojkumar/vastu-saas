@@ -161,15 +161,18 @@ def generate_report(
             detail="At least one room is required to generate a report"
         )
     
-    # Subscription check (Vastu product quota)
-    allowed, subscription_info = check_subscription(db, current_user.id, product="vastu")
-    
-    if not allowed:
-        logger.warning(f"User {current_user.id} has no active subscription")
-        raise HTTPException(
-            status_code=403,
-            detail=f"Active subscription required. {subscription_info}"
-        )
+    # Subscription check (Vastu product quota). Admins can generate without a plan.
+    if getattr(current_user, "role", None) != "admin":
+        allowed, subscription_info = check_subscription(db, current_user.id, product="vastu")
+
+        if not allowed:
+            logger.warning(
+                f"User {current_user.id} subscription check failed: {subscription_info}"
+            )
+            raise HTTPException(
+                status_code=403,
+                detail=f"Active subscription required. {subscription_info}"
+            )
     
     # Create task record
     task_id = str(uuid.uuid4())
