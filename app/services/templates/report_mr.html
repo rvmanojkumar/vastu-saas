@@ -218,6 +218,7 @@ tr{
     width:50%;
     padding:5px;
     vertical-align:top;
+    text-align:left;
 }
 
 /* =========================================================
@@ -250,12 +251,16 @@ tr{
     table-layout:fixed;
 }
 
+.analysis-table th,
+.analysis-table td{
+    text-align:left;
+}
+
 .analysis-table th{
     background:#5b3a22;
     color:#ffffff;
     padding:7px;
     font-size:10px;
-    text-align:left;
 }
 
 .analysis-table td{
@@ -265,7 +270,7 @@ tr{
     font-size:10px;
     word-wrap:break-word;
     overflow-wrap:anywhere;
-    white-space:pre-wrap;
+    white-space:pre-line;
 }
 
 .analysis-table th:nth-child(5),
