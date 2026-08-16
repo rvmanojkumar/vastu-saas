@@ -1,6 +1,13 @@
 from typing import Dict, Any
 
 
+def _multiline(text) -> str:
+    if not text:
+        return ""
+    parts = str(text).replace("|", "\n").splitlines()
+    return "\n".join(part.strip() for part in parts if part.strip())
+
+
 def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
 
     project = context.get("project")
@@ -33,12 +40,16 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
 
         # ================= CLIENT =================
         "client": {
-            "name": client.get("name", "") if isinstance(client, dict) else ""
+            "name": getattr(project, "name", "") if project else (
+                client.get("name", "") if isinstance(client, dict) else ""
+            ),
+            "description": getattr(project, "description", "") if project else "",
         },
 
         # ================= PROJECT =================
         "project": {
             "name": getattr(project, "name", "") if project else "",
+            "description": getattr(project, "description", "") if project else "",
             "type": getattr(project, "property_type", "") if project else ""
         },
 
@@ -72,9 +83,9 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
                 "direction": row.get("direction", ""),
                 "status": row.get("status", row.get("state", "")),
                 "color": row.get("color", ""),
-                "remedy": row.get("remedy", ""),
-                "sug_remedy": row.get("sug_remedy", ""),
-                "description": row.get("description", ""),
+                "remedy": _multiline(row.get("remedy", "")),
+                "sug_remedy": _multiline(row.get("sug_remedy", "")),
+                "description": row.get("description", "") or row.get("analysis", ""),
                 "therapy": row.get("therapy", ""),
                 "rating": row.get("rating", 0),
                 "type": row.get("type", "")
@@ -83,7 +94,15 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
         ],
 
         # ================= RULE ENGINE OUTPUT =================
-        "ratings": rating_rows,
+        "ratings": [
+            {
+                **row,
+                "remedy": _multiline(row.get("remedy", "")),
+                "sug_remedy": _multiline(row.get("sug_remedy", "")),
+                "analysis": row.get("analysis", "") or row.get("description", ""),
+            }
+            for row in rating_rows
+        ],
 
         # ================= MEDIA =================
         "logo_url": request_data.get("logo_url", sp_logo_url),

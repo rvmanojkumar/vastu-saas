@@ -26,7 +26,8 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         if subscription:
             plan = db.query(Plan).filter(Plan.id == subscription.plan_id).first()
         client = {
-            "name": getattr(project, "description", "") if project else ""
+            "name": getattr(project, "name", "") if project else "",
+            "description": getattr(project, "description", "") if project else "",
         } if project else None
 
         analysis_data = compute_vastu_analysis(db, project_id,lang=lang)

@@ -4,7 +4,7 @@ import os
 import math
 import traceback
 import sys
-from docxtpl import DocxTemplate,InlineImage
+from docxtpl import DocxTemplate, InlineImage, RichText
 from docx.shared import Mm
 import matplotlib
 matplotlib.use('Agg')
@@ -32,6 +32,19 @@ def sanitize_payload(data):
         return ""
 
     return data
+
+
+def _docx_multiline(text):
+    """Turn newline-separated text into Word line breaks."""
+    rt = RichText()
+    lines = [part for part in str(text or "").splitlines() if part.strip()]
+    if not lines:
+        return ""
+    for i, line in enumerate(lines):
+        if i:
+            rt.add("\n")
+        rt.add(line)
+    return rt
 
 
 # =========================
@@ -103,6 +116,12 @@ def generate_docx(data, file_path, project_id):
         # prepare rating pairs for detailed analysis grid
         ratings = data.get('ratings', [])
         data['rating_pairs'] = [ratings[i:i+2] for i in range(0, len(ratings), 2)]
+        for row in ratings:
+            if isinstance(row, dict):
+                if row.get("remedy"):
+                    row["remedy"] = _docx_multiline(row.get("remedy"))
+                if row.get("sug_remedy"):
+                    row["sug_remedy"] = _docx_multiline(row.get("sug_remedy"))
         # inline images
         chart32_path = os.path.abspath(f"storage/projects/{project_id}/compass_32.png")
         chart16_path = os.path.abspath(f"storage/projects/{project_id}/compass_16.png")
