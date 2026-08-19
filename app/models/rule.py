@@ -36,7 +36,7 @@ class Rule(Base):
 
     ratings = ratings = Column(Numeric(3, 1), default=0)
 
-    color = Column(String(50), nullable=True)
+    color = Column(Text, nullable=True)
     therapy = Column(Text, nullable=True)
 
     __table_args__ = (
