@@ -19,6 +19,7 @@ from app.models.report import Report
 from app.models.object import Object
 from app.core.security import get_current_admin
 from app.services.subscription import increment_usage
+from app.utils.text_sanitize import sanitize_rule_payload
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -635,26 +636,27 @@ def create_rule(
     current_admin: User = Depends(get_current_admin)
 ):
 
+    payload = sanitize_rule_payload(data.dict())
     rule = Rule(
-        entity_type=data.entity_type,
-        entity_name=data.entity_name,
-        direction_system=data.direction_system,
-        direction_value=data.direction_value,
+        entity_type=payload["entity_type"],
+        entity_name=payload["entity_name"],
+        direction_system=payload["direction_system"],
+        direction_value=payload["direction_value"],
 
-        result=data.result,
-        title=data.title,
-        description_en=data.description_en,
-        description_hi=data.description_hi,
-        description_mr=data.description_mr,
-        remedy_en=data.remedy_en,
-        remedy_hi=data.remedy_hi,
-        remedy_mr=data.remedy_mr,
-        sug_remedy_en=data.sug_remedy_en,
-        sug_remedy_hi=data.sug_remedy_hi,
-        sug_remedy_mr=data.sug_remedy_mr,
-        ratings=data.ratings,
-        color=data.color,
-        therapy=data.therapy,
+        result=payload.get("result"),
+        title=payload.get("title"),
+        description_en=payload.get("description_en"),
+        description_hi=payload.get("description_hi"),
+        description_mr=payload.get("description_mr"),
+        remedy_en=payload.get("remedy_en"),
+        remedy_hi=payload.get("remedy_hi"),
+        remedy_mr=payload.get("remedy_mr"),
+        sug_remedy_en=payload.get("sug_remedy_en"),
+        sug_remedy_hi=payload.get("sug_remedy_hi"),
+        sug_remedy_mr=payload.get("sug_remedy_mr"),
+        ratings=payload.get("ratings"),
+        color=payload.get("color"),
+        therapy=payload.get("therapy"),
     )
 
     db.add(rule)
@@ -684,7 +686,7 @@ def update_rule(
     if not rule:
         raise HTTPException(404, "Rule not found")
 
-    update_data = data.dict(exclude_unset=True)
+    update_data = sanitize_rule_payload(data.dict(exclude_unset=True))
 
     for key, value in update_data.items():
         setattr(rule, key, value)

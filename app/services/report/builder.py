@@ -85,8 +85,8 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
                 "color": row.get("color", ""),
                 "remedy": _multiline(row.get("remedy", "")),
                 "sug_remedy": _multiline(row.get("sug_remedy", "")),
-                "description": row.get("description", "") or row.get("analysis", ""),
-                "therapy": row.get("therapy", ""),
+                "description": _multiline(row.get("description", "") or row.get("analysis", "")),
+                "therapy": _multiline(row.get("therapy", "")),
                 "rating": row.get("rating", 0),
                 "type": row.get("type", "")
             }
@@ -99,7 +99,10 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
                 **row,
                 "remedy": _multiline(row.get("remedy", "")),
                 "sug_remedy": _multiline(row.get("sug_remedy", "")),
-                "analysis": row.get("analysis", "") or row.get("description", ""),
+                "analysis": _multiline(row.get("analysis", "") or row.get("description", "")),
+                "therapy": _multiline(row.get("therapy", "")),
+                "color": row.get("color", "") or "",
+                "state": row.get("state") or row.get("status", ""),
             }
             for row in rating_rows
         ],

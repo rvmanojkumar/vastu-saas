@@ -1,4 +1,4 @@
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from weasyprint import HTML
 import os
 import math
@@ -13,6 +13,7 @@ import io
 from docxtpl import InlineImage
 from docx.shared import Inches,Emu
 from docx import Document as DocxDocument
+from app.utils.text_sanitize import sanitize_display_text
 
 # =========================
 # SAFE HELPERS
@@ -31,11 +32,23 @@ def sanitize_payload(data):
     elif data is None:
         return ""
 
+    elif isinstance(data, str):
+        return sanitize_display_text(data)
+
     return data
 
 
+def _join_lines(*parts):
+    lines = []
+    for part in parts:
+        text = str(part or "").strip()
+        if text:
+            lines.append(text)
+    return "\n".join(lines)
+
+
 def _docx_multiline(text):
-    """Turn newline-separated text into Word line breaks."""
+    """Turn newline-separated text into Word line breaks (XML-safe)."""
     rt = RichText()
     lines = [part for part in str(text or "").splitlines() if part.strip()]
     if not lines:
@@ -63,7 +76,8 @@ def generate_pdf(data, file_path):
         )
         # template loader
         env = Environment(
-            loader=FileSystemLoader(TEMPLATE_DIR)
+            loader=FileSystemLoader(TEMPLATE_DIR),
+            autoescape=select_autoescape(["html", "xml"]),
         )
         # load template
         template = env.get_template(f"report_{lang}.html")
@@ -117,11 +131,17 @@ def generate_docx(data, file_path, project_id):
         ratings = data.get('ratings', [])
         data['rating_pairs'] = [ratings[i:i+2] for i in range(0, len(ratings), 2)]
         for row in ratings:
-            if isinstance(row, dict):
-                if row.get("remedy"):
-                    row["remedy"] = _docx_multiline(row.get("remedy"))
-                if row.get("sug_remedy"):
-                    row["sug_remedy"] = _docx_multiline(row.get("sug_remedy"))
+            if not isinstance(row, dict):
+                continue
+            combined = _join_lines(row.get("remedy"), row.get("therapy"))
+            if combined:
+                row["remedy"] = _docx_multiline(combined)
+            if row.get("sug_remedy"):
+                row["sug_remedy"] = _docx_multiline(row.get("sug_remedy"))
+            if row.get("analysis"):
+                row["analysis"] = _docx_multiline(row.get("analysis"))
+            if row.get("color"):
+                row["color"] = _docx_multiline(row.get("color"))
         # inline images
         chart32_path = os.path.abspath(f"storage/projects/{project_id}/compass_32.png")
         chart16_path = os.path.abspath(f"storage/projects/{project_id}/compass_16.png")

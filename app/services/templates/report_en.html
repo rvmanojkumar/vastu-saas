@@ -171,6 +171,20 @@ tr{
     margin-bottom:12px;
 }
 
+.notes-space{
+    min-height:130mm;
+    border:1px solid #e4d8cb;
+    background:#faf8f5;
+    padding:10px 12px;
+}
+
+.notes-hint{
+    color:#8a7a6a;
+    font-style:italic;
+    font-size:10px;
+    margin:0;
+}
+
 /* =========================================================
    INFO BOX
 ========================================================= */
@@ -870,58 +884,6 @@ tr{
 </div>
 {% if is_whitelabel %}
 <!-- =====================================================
-     ROOM ANALYSIS
-===================================================== -->
-<div class="card">
-
-    <div class="card-title">
-        Room Wise Analysis
-    </div>
-
-    <table class="analysis-table">
-
-        <tr>
-            <th>Room</th>
-            <th>Direction</th>
-            <th>Status</th>
-            <th>Color</th>
-            <th>Remedy</th>
-        </tr>
-
-        {% for room in ratings %}
-        {% if room.type and room.type|lower == 'room' %}
-
-        <tr>
-
-            <td>
-                {{ room.name if room.name else 'N/A' }}
-            </td>
-
-            <td>
-                {{ room.direction if room.direction else 'N/A' }}
-            </td>
-
-            <td>
-                {{ room.status if room.status else 'N/A' }}
-            </td>
-
-            <td>
-                {{ room.color if room.color else 'N/A' }}
-            </td>
-
-            <td>
-                {{ room.remedy if room.remedy else 'N/A' }}
-            </td>
-
-        </tr>
-        {% endif %}
-        {% endfor %}
-
-    </table>
-
-</div>
-
-<!-- =====================================================
      DETAILED ANALYSIS
 ===================================================== -->
 
@@ -964,6 +926,60 @@ tr{
 </div>
 
 <!-- =====================================================
+     ROOM ANALYSIS
+===================================================== -->
+<div class="card">
+
+    <div class="card-title">
+        Room Wise Analysis
+    </div>
+
+    <table class="analysis-table">
+
+        <tr>
+            <th>Room</th>
+            <th>Direction</th>
+            <th>Status</th>
+            <th>Color</th>
+            <th>Remedy / Therapy</th>
+        </tr>
+
+        {% for room in ratings %}
+        {% if room.type and room.type|lower == 'room' %}
+
+        <tr>
+
+            <td>
+                {{ room.name if room.name else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.direction if room.direction else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.status if room.status else 'N/A' }}
+            </td>
+
+            <td>
+                {{ room.color if room.color else 'N/A' }}
+            </td>
+
+            <td>
+                {% if room.remedy %}{{ room.remedy }}{% else %}N/A{% endif %}{% if room.therapy %}
+
+{{ room.therapy }}{% endif %}
+            </td>
+
+        </tr>
+        {% endif %}
+        {% endfor %}
+
+    </table>
+
+</div>
+
+<!-- =====================================================
      REMEDIES
 ===================================================== -->
 
@@ -988,6 +1004,17 @@ tr{
 
 </div>
 {% endif %}
+<div class="card">
+
+    <div class="card-title">
+        Personalised Notes
+    </div>
+
+    <div class="notes-space">
+        <p class="notes-hint">Space for the consultant / astrologer to add personalised notes.</p>
+    </div>
+
+</div>
 <div class="card">
 
     <div class="card-title">

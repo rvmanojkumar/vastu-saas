@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from app.db.session import SessionLocal
 from app.models.user import User
@@ -19,6 +19,11 @@ from app.core.security import (
 )
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6, max_length=72)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -236,6 +241,31 @@ def get_subscription_status(
         message=message,
         whitelabel=whitelabel_status,
     )
+
+@router.post("/change-password")
+def change_password(
+    data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Let a logged-in user change their own password."""
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(data.current_password, user.password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    if data.current_password == data.new_password:
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be different from the current password",
+        )
+
+    user.password = get_password_hash(data.new_password)
+    db.commit()
+    return {"success": True, "message": "Password updated successfully"}
+
 
 @router.post("/logout")
 def logout(current_user: User = Depends(get_current_user)):
