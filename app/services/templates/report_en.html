@@ -361,6 +361,13 @@ tr{
   text-align: center;
 }
 
+.bar-chart-img {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
+}
+
 /* Main Graphic Layout Wrapper */
 .chart-main-wrapper {
   display: grid;
@@ -820,52 +827,9 @@ tr{
 
 ======================================================= -->
  <div class="chart-container">
-            <h3 class="chart-title">Room Ratings Analysis</h3>
-
-            <div class="chart-main-wrapper">
-                <div class="y-axis">
-                <div class="y-label y-label-top" style="top: 0%;">10</div>
-                <div class="y-label" style="top: 20%;">8</div>
-                <div class="y-label" style="top: 40%;">6</div>
-                <div class="y-label" style="top: 60%;">4</div>
-                <div class="y-label" style="top: 80%;">2</div>
-                <div class="y-label y-label-bottom" style="top: 100%;">0</div>
-                </div>
-
-                <div class="chart-graph-area">
-                <div class="grid-lines">
-                    <div class="grid-line" style="top: 0%;"></div>
-                    <div class="grid-line" style="top: 20%;"></div>
-                    <div class="grid-line" style="top: 40%;"></div>
-                    <div class="grid-line" style="top: 60%;"></div>
-                    <div class="grid-line" style="top: 80%;"></div>
-                </div>
-
-                <div class="bars-container">
-                    {% for item in ratings %}
-                    {% if(item.type and item.type|lower == 'room') %}
-                    {% set percentage = item.rating * 10 %}
-                    <div class="chart-bar-column">
-                        <div class="chart-bar" {{ 'style="height: ' ~ percentage ~ '%;"' | safe }}>
-                        <span class="chart-value">{{ item.rating | rating_label }}</span>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                </div>
-            </div>
-
-            <div class="x-axis-wrapper">
-                <div class="y-axis-spacer"></div>
-                <div class="x-axis">
-                {% for item in ratings %}
-                    {% if(item.type and item.type|lower == 'room') %}
-                        <div class="x-label">{{ item.name }}</div>
-                    {% endif %}
-                {% endfor %}
-                </div>
-            </div>
+            {% if bar_chart_url %}
+            <img src="{{ bar_chart_url }}" alt="Room Ratings Analysis" class="bar-chart-img">
+            {% endif %}
             </div>
 <!-- =====================================================
      CHART

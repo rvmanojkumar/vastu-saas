@@ -4,6 +4,7 @@ import os
 import math
 import traceback
 import sys
+import base64
 from docxtpl import DocxTemplate, InlineImage, RichText
 from docx.shared import Mm
 import matplotlib
@@ -80,6 +81,8 @@ def generate_pdf(data, file_path):
             autoescape=select_autoescape(["html", "xml"]),
         )
         env.filters["rating_label"] = _format_rating_label
+        png = render_bar_chart_png(data.get("ratings") or [])
+        data["bar_chart_url"] = "data:image/png;base64," + base64.b64encode(png).decode("ascii")
         # load template
         template = env.get_template(f"report_{lang}.html")
         html_content = template.render(**data)
@@ -176,34 +179,59 @@ def _format_rating_label(val):
     return str(int(num)) if num == int(num) else f"{num:.1f}"
 
 
-def make_bar_chart_image(ratings, tpl):
-    """Generate a bar chart from room ratings and return an InlineImage."""
-    rooms = [r['name'] for r in ratings if r.get('type', '').lower() == 'room']
-    values = [float(r['rating'] or 0) for r in ratings if r.get('type', '').lower() == 'room']
+def _room_rating_series(ratings):
+    rooms, values = [], []
+    for row in ratings or []:
+        if not isinstance(row, dict):
+            continue
+        if str(row.get("type") or "").lower() != "room":
+            continue
+        rooms.append(row.get("name") or "")
+        try:
+            values.append(float(row.get("rating") or 0))
+        except (TypeError, ValueError):
+            values.append(0.0)
+    return rooms, values
 
-    fig, ax = plt.subplots(figsize=(7, 3))
-    bars = ax.bar(rooms, values, color='#3182ce', width=0.5)
 
-    # Value labels on top of each bar
-    for bar, val in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.1,
-                _format_rating_label(val), ha='center', va='bottom', fontsize=9, fontweight='bold')
-
+def render_bar_chart_png(ratings) -> bytes:
+    """Bar heights on a fixed 0–10 scale. Used by PDF and Word."""
+    rooms, values = _room_rating_series(ratings)
+    fig, ax = plt.subplots(figsize=(7.2, 3.2))
+    if rooms:
+        # Numeric x so duplicate room names (two Master Bedrooms) stay separate bars.
+        xs = list(range(len(rooms)))
+        bars = ax.bar(xs, values, color="#3182ce", width=0.55)
+        for bar, val in zip(bars, values):
+            height = bar.get_height()
+            label = _format_rating_label(val)
+            x = bar.get_x() + bar.get_width() / 2
+            if height >= 9.4:
+                ax.text(x, height - 0.25, label, ha="center", va="top",
+                        fontsize=9, fontweight="bold", color="white")
+            else:
+                ax.text(x, height + 0.12, label, ha="center", va="bottom",
+                        fontsize=9, fontweight="bold")
+        ax.set_xticks(xs)
+        ax.set_xticklabels(rooms)
     ax.set_ylim(0, 10)
     ax.set_yticks(range(0, 11, 2))
     ax.set_yticklabels([str(t) for t in range(0, 11, 2)])
-    ax.set_ylabel('Rating', fontsize=9)
-    ax.set_title('Room Ratings Analysis', fontsize=11, fontweight='bold')
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    plt.xticks(fontsize=8, rotation=15, ha='right')
-    plt.tight_layout()
-
+    ax.set_ylabel("Rating", fontsize=9)
+    ax.set_title("Room Ratings Analysis", fontsize=11, fontweight="bold")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    plt.setp(ax.get_xticklabels(), fontsize=8, rotation=15, ha="right")
+    fig.tight_layout()
     buf = io.BytesIO()
-    fig.savefig(buf, format='png', dpi=150)
+    fig.savefig(buf, format="png", dpi=150, facecolor="white")
     plt.close(fig)
-    buf.seek(0)
-    return InlineImage(tpl, buf, width=Mm(140))
+    return buf.getvalue()
+
+
+def make_bar_chart_image(ratings, tpl):
+    """Generate a bar chart from room ratings and return an InlineImage."""
+    return InlineImage(tpl, io.BytesIO(render_bar_chart_png(ratings)), width=Mm(140))
 def get_usable_width_emu(template_path):
     d = DocxDocument(template_path)
     sec = d.sections[0]
