@@ -79,6 +79,7 @@ def generate_pdf(data, file_path):
             loader=FileSystemLoader(TEMPLATE_DIR),
             autoescape=select_autoescape(["html", "xml"]),
         )
+        env.filters["rating_label"] = _format_rating_label
         # load template
         template = env.get_template(f"report_{lang}.html")
         html_content = template.render(**data)
@@ -166,10 +167,19 @@ def generate_docx(data, file_path, project_id):
         traceback.print_exc()
         raise e
 
+def _format_rating_label(val):
+    """Show whole ratings as 8, not 8.0."""
+    try:
+        num = float(val)
+    except (TypeError, ValueError):
+        return "0"
+    return str(int(num)) if num == int(num) else f"{num:.1f}"
+
+
 def make_bar_chart_image(ratings, tpl):
     """Generate a bar chart from room ratings and return an InlineImage."""
     rooms = [r['name'] for r in ratings if r.get('type', '').lower() == 'room']
-    values = [float(r['rating']) for r in ratings if r.get('type', '').lower() == 'room']
+    values = [float(r['rating'] or 0) for r in ratings if r.get('type', '').lower() == 'room']
 
     fig, ax = plt.subplots(figsize=(7, 3))
     bars = ax.bar(rooms, values, color='#3182ce', width=0.5)
@@ -177,10 +187,11 @@ def make_bar_chart_image(ratings, tpl):
     # Value labels on top of each bar
     for bar, val in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.1,
-                str(val), ha='center', va='bottom', fontsize=9, fontweight='bold')
+                _format_rating_label(val), ha='center', va='bottom', fontsize=9, fontweight='bold')
 
     ax.set_ylim(0, 10)
     ax.set_yticks(range(0, 11, 2))
+    ax.set_yticklabels([str(t) for t in range(0, 11, 2)])
     ax.set_ylabel('Rating', fontsize=9)
     ax.set_title('Room Ratings Analysis', fontsize=11, fontweight='bold')
     ax.spines['top'].set_visible(False)
