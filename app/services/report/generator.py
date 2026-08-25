@@ -15,6 +15,7 @@ from docxtpl import InlineImage
 from docx.shared import Inches,Emu
 from docx import Document as DocxDocument
 from app.utils.text_sanitize import sanitize_display_text
+from app.services.report.rule_engine import normalize_report_lang
 
 # =========================
 # SAFE HELPERS
@@ -48,16 +49,17 @@ def _join_lines(*parts):
     return "\n".join(lines)
 
 
-def _docx_multiline(text):
+def _docx_multiline(text, font=None):
     """Turn newline-separated text into Word line breaks (XML-safe)."""
     rt = RichText()
     lines = [part for part in str(text or "").splitlines() if part.strip()]
     if not lines:
         return ""
+    kwargs = {"font": font} if font else {}
     for i, line in enumerate(lines):
         if i:
-            rt.add("\n")
-        rt.add(line)
+            rt.add("\n", **kwargs)
+        rt.add(line, **kwargs)
     return rt
 
 
@@ -71,7 +73,8 @@ def generate_pdf(data, file_path):
         data = sanitize_payload(data)
         # absolute template path
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        lang = data.get("lang", "en")
+        lang = normalize_report_lang(data.get("lang", "en"))
+        data["lang"] = lang
         TEMPLATE_DIR = os.path.abspath(
             os.path.join(BASE_DIR, "..", "templates")
         )
@@ -123,7 +126,8 @@ def generate_docx(data, file_path, project_id):
         data = sanitize_payload(data)
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         # absolute template path
-        lang = data.get("lang", "en")
+        lang = normalize_report_lang(data.get("lang", "en"))
+        data["lang"] = lang
         TEMPLATE_PATH = os.path.abspath(
         os.path.join(BASE_DIR, "..", "templates", f"report_{lang}.docx")
         )
@@ -134,18 +138,19 @@ def generate_docx(data, file_path, project_id):
         # prepare rating pairs for detailed analysis grid
         ratings = data.get('ratings', [])
         data['rating_pairs'] = [ratings[i:i+2] for i in range(0, len(ratings), 2)]
+        docx_font = "Nirmala UI" if lang in ("hi", "mr") else None
         for row in ratings:
             if not isinstance(row, dict):
                 continue
             combined = _join_lines(row.get("remedy"), row.get("therapy"))
             if combined:
-                row["remedy"] = _docx_multiline(combined)
+                row["remedy"] = _docx_multiline(combined, font=docx_font)
             if row.get("sug_remedy"):
-                row["sug_remedy"] = _docx_multiline(row.get("sug_remedy"))
+                row["sug_remedy"] = _docx_multiline(row.get("sug_remedy"), font=docx_font)
             if row.get("analysis"):
-                row["analysis"] = _docx_multiline(row.get("analysis"))
+                row["analysis"] = _docx_multiline(row.get("analysis"), font=docx_font)
             if row.get("color"):
-                row["color"] = _docx_multiline(row.get("color"))
+                row["color"] = _docx_multiline(row.get("color"), font=docx_font)
         # inline images
         chart32_path = os.path.abspath(f"storage/projects/{project_id}/compass_32.png")
         chart16_path = os.path.abspath(f"storage/projects/{project_id}/compass_16.png")

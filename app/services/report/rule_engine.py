@@ -9,8 +9,30 @@ from app.utils.direction import normalize_direction
 # =========================
 # NORMALIZE HELPERS
 # =========================
+LANG_ALIASES = {
+    "en": "en", "eng": "en", "english": "en",
+    "hi": "hi", "hin": "hi", "hindi": "hi",
+    "mr": "mr", "mar": "mr", "marathi": "mr",
+}
+
+
 def normalize(val: str) -> str:
     return (val or "").strip().lower()
+
+
+def normalize_report_lang(lang: str) -> str:
+    code = (lang or "en").strip().lower()
+    return LANG_ALIASES.get(code, "en")
+
+
+def _pick_localized(matched: dict, field: str, lang: str) -> str:
+    """Use lang-specific rule text, then English, so HI/MR reports are not blank."""
+    primary = (matched.get(f"{field}_{lang}") or "").strip()
+    if primary:
+        return primary
+    if lang != "en":
+        return (matched.get(f"{field}_en") or "").strip()
+    return ""
 
 
 # =========================
@@ -86,6 +108,7 @@ def load_rules(db):
 
 def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
     from app.models import Polygon
+    lang = normalize_report_lang(lang)
 
     # =========================
     # FETCH DATA
@@ -128,9 +151,9 @@ def compute_vastu_analysis(db, project_id: int,lang: str = "en"):
 
         if matched:
             rating = float(matched.get("ratings", 0))
-            analysis = matched.get(f"description_{lang}") or ""
-            remedy   = matched.get(f"remedy_{lang}") or ""
-            sug_remedy = matched.get(f"sug_remedy_{lang}") or matched.get("sug_remedy_en") or ""
+            analysis = _pick_localized(matched, "description", lang)
+            remedy = _pick_localized(matched, "remedy", lang)
+            sug_remedy = _pick_localized(matched, "sug_remedy", lang)
             therapy = matched.get("therapy") or ""
             title = matched.get("title") or ""
             color = matched.get("color") or "#ccc"

@@ -8,7 +8,7 @@ from app.models import plan
 from app.models.polygon import Polygon as PolygonModel
 from app.models.subscription import Subscription
 from app.models.plan import Plan
-from app.services.report.rule_engine import compute_vastu_analysis
+from app.services.report.rule_engine import compute_vastu_analysis, normalize_report_lang
 import os
 
 def get_report_context(project_id: int, user_id: int, request_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -18,7 +18,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
     try:
        
         # ================= CORE ENTITIES =================
-        lang = request_data.get("lang", "en") 
+        lang = normalize_report_lang(request_data.get("lang", "en")) 
         project = db.query(Project).filter(Project.id == project_id).first()
         user = db.query(User).filter(User.id == user_id).first()
         subscription = db.query(Subscription).filter(Subscription.user_id == user_id).first()
