@@ -18,3 +18,4 @@ from .report_item import ReportItem
 from .floorplan import  ProjectImage, CanvasState
 from .polygon import Polygon, PolygonType
 from .promocode import Promocode
+from .system_setting import SystemSetting

@@ -27,6 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.admin import router as admin_router
 from app.api.floorplan import router as floorplan_router
 from app.api.plan import router as plans_router
+from app.api.settings import router as settings_router
 import os
 os.makedirs("logs", exist_ok=True)
 app = FastAPI()
@@ -51,13 +52,14 @@ app.include_router(ws_router)
 app.include_router(tasks_router)
 app.include_router(floorplan_router)
 app.include_router(plans_router)
+app.include_router(settings_router)
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
 @app.get("/")
 def root():
     return {
         "message": "Vastu SaaS API",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "endpoints": {
             "auth": "/auth",
             "subscriptions": "/api/subscriptions",

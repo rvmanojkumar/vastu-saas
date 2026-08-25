@@ -29,6 +29,7 @@ import app.models.floorplan
 import app.models.polygon
 import app.models.promocode
 import app.models.payment
+import app.models.system_setting
 
 
 config = context.config

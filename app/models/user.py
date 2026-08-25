@@ -23,5 +23,6 @@ class User(Base):
     footer_text = Column(Text)
     
     is_active = Column(Boolean, default=True)
+    phone_verified = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)

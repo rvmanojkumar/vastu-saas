@@ -103,6 +103,14 @@ def create_order(
     never trust an amount sent by the client.
     Optional promocode is validated and applied server-side.
     """
+    from app.services.firebase_auth import firebase_verification_required
+
+    if firebase_verification_required(db) and not current_user.phone_verified:
+        raise HTTPException(
+            status_code=400,
+            detail="Please verify your phone number before payment",
+        )
+
     client, key_id = _get_razorpay_client()
 
     plan = db.query(Plan).filter(Plan.id == body.plan_id).first()
@@ -255,6 +263,19 @@ def verify_payment(
     db.add(subscription)
     db.commit()
     db.refresh(subscription)
+
+    try:
+        from app.services.emailer import send_payment_email
+        from app.models.plan import Plan as PlanModel
+        plan_row = db.query(PlanModel).filter(PlanModel.id == subscription.plan_id).first()
+        send_payment_email(
+            current_user.name,
+            current_user.email,
+            plan_name=plan_row.name if plan_row else payment.plan_name,
+            amount=str(payment.amount) if payment.amount is not None else None,
+        )
+    except Exception:
+        logger.exception("Payment success email failed")
 
     return {
         "message": "Payment verified and subscription activated",
