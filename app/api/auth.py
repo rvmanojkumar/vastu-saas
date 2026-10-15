@@ -1,5 +1,5 @@
 import re
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -64,9 +64,14 @@ class SubscriptionStatusResponse(BaseModel):
     has_subscription: bool
     is_active: bool
     plan_id: Optional[int]
+    product_access: Optional[str] = None
     reports_limit: Optional[int]
     reports_used: Optional[int]
     remaining_reports: Optional[int]
+    vastu_reports_limit: Optional[int] = None
+    vastu_reports_used: Optional[int] = None
+    numerology_reports_limit: Optional[int] = None
+    numerology_reports_used: Optional[int] = None
     expires_on: Optional[datetime]
     can_create_project: bool
     can_generate_report: bool
@@ -295,50 +300,83 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 @router.get("/subscription-status")
 def get_subscription_status(
+    product: str = Query("vastu", description="vastu | numerology"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Check user's subscription status and available reports"""
+    """Check user's subscription status and available reports for a product."""
+    product = (product or "vastu").lower()
+    if product not in ("vastu", "numerology"):
+        raise HTTPException(400, "product must be vastu or numerology")
 
     subscription = db.query(Subscription).filter(
         Subscription.user_id == current_user.id,
         Subscription.status == "active",
         Subscription.end_date > datetime.utcnow()
     ).first()
+
+    empty = SubscriptionStatusResponse(
+        has_subscription=False,
+        is_active=False,
+        plan_id=None,
+        product_access=None,
+        reports_limit=None,
+        reports_used=None,
+        remaining_reports=None,
+        vastu_reports_limit=None,
+        vastu_reports_used=None,
+        numerology_reports_limit=None,
+        numerology_reports_used=None,
+        expires_on=None,
+        can_create_project=False,
+        can_generate_report=False,
+        message="No active subscription. Please purchase a plan to create projects and generate reports.",
+        whitelabel=False,
+    )
+
     if not subscription:
-        return SubscriptionStatusResponse(
-            has_subscription=False,
-            is_active=False,
-            plan_id=None,
-            reports_limit=None,
-            reports_used=None,
-            remaining_reports=None,
-            expires_on=None,
-            can_create_project=False,
-            can_generate_report=False,
-            message="No active subscription. Please purchase a plan to create projects and generate reports.",
-            whitelabel=False,
-        )
+        return empty
 
-    remaining = (subscription.reports_limit or 0) - (subscription.reports_used or 0)
-    can_create = subscription.status == "active" and subscription.end_date > datetime.utcnow()
-    can_generate = remaining > 0
-
-    message = f"You have {remaining} reports remaining out of {subscription.reports_limit}"
-    if remaining <= 0:
-        message = "You have exhausted your report limit. Please upgrade your plan."
-    elif remaining <= 3:
-        message = f"Warning: Only {remaining} reports remaining. Consider upgrading."
+    access = (subscription.product_access or "both").lower()
     whitelabel_status = bool(
         subscription.plan.is_whitelabel if subscription.plan else False
     )
+
+    if product == "numerology":
+        limit = subscription.numerology_reports_limit or 0
+        used = subscription.numerology_reports_used or 0
+    else:
+        limit = subscription.vastu_reports_limit or subscription.reports_limit or 0
+        used = subscription.vastu_reports_used
+        if used is None:
+            used = subscription.reports_used or 0
+
+    remaining = max(limit - used, 0)
+    product_allowed = access in ("both", product)
+    can_create = True
+    can_generate = product_allowed and remaining > 0
+
+    if not product_allowed:
+        message = f"Your plan ({access}) does not include {product} reports."
+    elif remaining <= 0:
+        message = f"You have exhausted your {product} report limit. Please upgrade your plan."
+    elif remaining <= 3:
+        message = f"Warning: Only {remaining} {product} reports remaining. Consider upgrading."
+    else:
+        message = f"You have {remaining} {product} reports remaining out of {limit}"
+
     return SubscriptionStatusResponse(
         has_subscription=True,
         is_active=True,
         plan_id=subscription.plan_id,
-        reports_limit=subscription.reports_limit,
-        reports_used=subscription.reports_used,
+        product_access=access,
+        reports_limit=limit,
+        reports_used=used,
         remaining_reports=remaining,
+        vastu_reports_limit=subscription.vastu_reports_limit,
+        vastu_reports_used=subscription.vastu_reports_used,
+        numerology_reports_limit=subscription.numerology_reports_limit,
+        numerology_reports_used=subscription.numerology_reports_used,
         expires_on=subscription.end_date,
         can_create_project=can_create,
         can_generate_report=can_generate,

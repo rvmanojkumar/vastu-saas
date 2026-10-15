@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'en' }}">
+<head>
+<meta charset="UTF-8">
+<title>{{ report_title or "SPIRITUAL HUT - Numerology Report" }}</title>
+<style>
+@page { size: A4; margin: 12mm; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px; line-height: 1.5; color: #2b2b2b; background: #fff;
+}
+img { max-width: 100%; display: block; }
+table { width: 100%; border-collapse: collapse; }
+.page-break { page-break-after: always; }
+.no-break { page-break-inside: avoid; }
+.watermark {
+  position: fixed; top: 40%; left: 8%; transform: rotate(-30deg);
+  font-size: 42px; font-weight: bold; color: #000; opacity: 0.03; z-index: -1;
+}
+.cover {
+  min-height: 250mm; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  background: linear-gradient(180deg, #2F002E 0%, #5B2E5A 100%);
+  color: #fff; padding: 40px 24px; border-radius: 4px;
+}
+.cover h1 { font-size: 34px; margin: 8px 0; letter-spacing: 1px; }
+.cover h2 { font-size: 22px; font-weight: normal; margin: 0 0 24px; opacity: 0.95; }
+.cover .client { font-size: 20px; margin-top: 30px; font-weight: bold; }
+.cover .meta { margin-top: 40px; font-size: 12px; opacity: 0.9; line-height: 1.7; }
+.header {
+  border-bottom: 2px solid #2F002E; padding-bottom: 10px; margin-bottom: 16px;
+}
+.brand-title { font-size: 18px; font-weight: bold; color: #2F002E; }
+.brand-subtitle { font-size: 11px; color: #5B2E5A; }
+h2.section {
+  color: #2F002E; font-size: 16px; border-left: 4px solid #2F002E;
+  padding-left: 10px; margin: 22px 0 10px;
+}
+h3 { color: #5B2E5A; font-size: 13px; margin: 14px 0 6px; }
+.chart-table td, .chart-table th {
+  border: 1px solid #d8c8d8; padding: 8px 10px; text-align: left;
+}
+.chart-table th { background: #2F002E; color: #fff; width: 40%; }
+.chart-table tr:nth-child(even) td { background: #f7f3f7; }
+.grid {
+  width: 220px; margin: 12px auto; border: 2px solid #2F002E;
+}
+.grid td {
+  width: 70px; height: 70px; border: 1px solid #2F002E;
+  text-align: center; vertical-align: middle; font-size: 16px; font-weight: bold;
+  color: #2F002E;
+}
+.pill {
+  display: inline-block; background: #f7f3f7; border: 1px solid #d8c8d8;
+  padding: 3px 8px; margin: 2px; border-radius: 4px;
+}
+.footer {
+  margin-top: 28px; padding-top: 10px; border-top: 1px solid #ddd;
+  font-size: 10px; color: #666; text-align: center;
+}
+ul { margin: 6px 0 6px 18px; padding: 0; }
+p { margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="watermark">SPIRITUAL HUT</div>
+
+<!-- COVER -->
+<div class="cover page-break">
+  <div style="font-size:13px; letter-spacing:3px; opacity:0.85;">SPIRITUAL HUT ACADEMY OF OCCULT SCIENCE</div>
+  <h1>NUMEROLOGY REPORT</h1>
+  <h2>By Dr. Amrutha Amberkar</h2>
+  <div class="client">{{ chart.full_name }}</div>
+  <div style="margin-top:8px;">DOB: {{ chart.dob_display }} · {{ chart.gender }}</div>
+  <div class="meta">
+    PhD Vastu Consultant, Doctorate (Hon.D.N.) in Numerology<br>
+    Tarot Card Reader &amp; Energy Healer<br>
+    Email: spiritualhut05@gmail.com · www.spiritualhut.in
+  </div>
+</div>
+
+<!-- INTRO + CHART -->
+<div class="header no-break">
+  <div class="brand-title">SPIRITUAL HUT</div>
+  <div class="brand-subtitle">Numerology Report · {{ chart.full_name }}</div>
+</div>
+
+<h2 class="section">Introduction</h2>
+<p>
+  Numerology is an ancient interpretive system that explores how numerical patterns
+  influence an individual’s personality, behaviour, and life experiences. Based on the
+  belief that numbers carry unique vibrations and symbolic meanings, numerology provides
+  a framework for understanding the deeper structure of a person’s character and life path.
+</p>
+
+<h2 class="section">Core Chart</h2>
+<table class="chart-table no-break">
+  <tr><th>Name</th><td>{{ chart.full_name }}</td></tr>
+  <tr><th>Date of Birth</th><td>{{ chart.dob_display }}</td></tr>
+  <tr><th>Moolank (Driver)</th><td>{{ chart.moolank }} · {{ chart.moolank_planet }}</td></tr>
+  <tr><th>Bhagyank (Destiny)</th><td>{{ chart.bhagyank }} · {{ chart.bhagyank_planet }}</td></tr>
+  <tr><th>Zodiac Sign</th><td>{{ chart.zodiac_sign }}</td></tr>
+  <tr><th>Zodiac Planet</th><td>{{ chart.zodiac_planet }}</td></tr>
+  <tr><th>First Name Number</th><td>{{ chart.first_name_number }} (compound {{ chart.first_name_compound }})</td></tr>
+  <tr><th>Last Name Number</th><td>{{ chart.last_name_number }} (compound {{ chart.last_name_compound }})</td></tr>
+  <tr><th>Full Name Number</th><td>{{ chart.full_name_number }} (compound {{ chart.full_name_compound }})</td></tr>
+  <tr><th>Maha Dasha</th><td>{{ chart.dasha.maha_dasha }} · {{ chart.dasha.maha_planet }}</td></tr>
+  <tr><th>Antar Dasha</th><td>{{ chart.dasha.antar_dasha }}</td></tr>
+  <tr><th>Pratyantar Dasha</th><td>{{ chart.dasha.pratyantar_dasha }}</td></tr>
+  <tr><th>Compatibility</th><td>{{ chart.compatibility.score }}%</td></tr>
+  <tr><th>Friend Numbers</th><td>{{ chart.compatibility.friend | join(', ') }}</td></tr>
+  <tr><th>Enemy Numbers</th><td>{{ chart.compatibility.enemy | join(', ') if chart.compatibility.enemy else '—' }}</td></tr>
+  <tr><th>Neutral Numbers</th><td>{{ chart.compatibility.neutral | join(', ') }}</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2 class="section">Personal Information</h2>
+<p>
+  As your Moolank is <strong>{{ chart.moolank }}</strong>, which is associated with
+  <strong>{{ chart.moolank_planet }}</strong>, the following themes are highlighted in your chart.
+  Detailed interpretive paragraphs for each number will be loaded from the content library
+  (EN / MR / HI) and refined to match your Spiritual Hut PDF templates.
+</p>
+<ul>
+  <li>Talents &amp; nature linked to number {{ chart.moolank }}</li>
+  <li>Overall personality with {{ chart.zodiac_sign }} influence</li>
+  <li>Health tendencies for Moolank {{ chart.moolank }}</li>
+  <li>Career directions aligned with {{ chart.moolank_planet }}</li>
+</ul>
+
+<h2 class="section">Lo-Shu Grid</h2>
+<p>DOB digits mapped into the Lo-Shu square. Empty cells indicate missing numbers.</p>
+<table class="grid no-break">
+  {% for row in chart.loshu.grid %}
+  <tr>
+    {% for cell in row %}
+    <td>{{ cell if cell else '·' }}</td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+<p>
+  <strong>Present:</strong>
+  {% for n in chart.loshu.present %}<span class="pill">{{ n }}</span>{% endfor %}
+  &nbsp; <strong>Missing:</strong>
+  {% for n in chart.loshu.missing %}<span class="pill">{{ n }}</span>{% endfor %}
+</p>
+
+<h2 class="section">Name Numerology (Chaldean)</h2>
+<p>
+  Full name compound total is <strong>{{ chart.full_name_compound }}</strong>,
+  reducing to <strong>{{ chart.full_name_number }}</strong>.
+  First name reduces to {{ chart.first_name_number }}; last name to {{ chart.last_name_number }}.
+</p>
+
+{% if chart.mobile %}
+<h2 class="section">Mobile Number Analysis</h2>
+<p>
+  Mobile <strong>{{ chart.mobile.number }}</strong> totals
+  <strong>{{ chart.mobile.total }}</strong> →
+  <strong>{{ chart.mobile.reduced }}</strong>.
+  Compare this with your friendly numbers
+  ({{ chart.compatibility.friend | join(', ') }}) for suitability guidance.
+</p>
+{% endif %}
+
+<h2 class="section">Remedies (overview)</h2>
+<p>
+  Remedies, lucky colours, dates, days, stones, and lifestyle guidance for Moolank
+  {{ chart.moolank }} will be pulled from the admin-managed content tables — matching
+  the structure used in your sample Spiritual Hut reports.
+</p>
+
+<div class="footer">
+  Generated on {{ chart.generated_at }} · Spiritual Hut Academy of Occult Science · Confidential
+</div>
+</body>
+</html>

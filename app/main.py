@@ -27,6 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.admin import router as admin_router
 from app.api.floorplan import router as floorplan_router
 from app.api.plan import router as plans_router
+from app.api.numerology import router as numerology_router
 from app.api.settings import router as settings_router
 import os
 os.makedirs("logs", exist_ok=True)
@@ -52,6 +53,7 @@ app.include_router(ws_router)
 app.include_router(tasks_router)
 app.include_router(floorplan_router)
 app.include_router(plans_router)
+app.include_router(numerology_router)
 app.include_router(settings_router)
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
@@ -65,6 +67,7 @@ def root():
             "subscriptions": "/api/subscriptions",
             "projects": "/projects",
             "reports": "/reports",
+            "numerology": "/numerology",
             "plans": "/plans"
         }
     }

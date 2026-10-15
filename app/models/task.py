@@ -9,7 +9,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     task_id = Column(String(100), unique=True, nullable=False, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     status = Column(String(20), default="PENDING", index=True)
     progress = Column(Float, default=0.0)
     result_path = Column(String(500), nullable=True)
