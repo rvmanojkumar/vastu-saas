@@ -16,6 +16,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
     client = context.get("client")
     chart32 = context.get("chart32")
     chart16 = context.get("chart16")
+    chart45 = context.get("chart45") or ""
     request_data = context.get("request_data", {})
     sp_logo_url = context.get("sp_logo_url", "")
     lang =  context.get("lang", "en")
@@ -111,6 +112,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
         "logo_url": request_data.get("logo_url", sp_logo_url),
         "chart32_url": chart32,
         "chart16_url": chart16,
+        "chart45_url": chart45,
         "lang":lang,
 
         # ================= FOOTER =================

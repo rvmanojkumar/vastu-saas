@@ -321,13 +321,39 @@ tr{
     padding:8px;
     margin:auto;
 }
+.compass-card {
+    page-break-inside: auto;
+    break-inside: auto;
+}
+
 .compass-section {
     text-align: center;
 }
 
-.chart-block img {
-    max-width: 100%;
+.compass-section .chart-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin: 0;
+}
+
+.compass-section .chart-block + .chart-block {
+    page-break-before: always;
+    break-before: page;
+}
+
+.compass-section .chart-block h2 {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+}
+
+.compass-section .chart-block img {
+    display: block;
+    width: auto;
     height: auto;
+    max-width: 100%;
+    max-height: 220mm;
+    object-fit: contain;
+    margin: 0 auto;
 }
 
 /* =========================================================
@@ -848,7 +874,7 @@ tr{
      CHART
 ===================================================== -->
 
-<div class="card no-break">
+<div class="card compass-card">
 
     <div class="card-title">
         Floor Plan
@@ -858,13 +884,20 @@ tr{
 
     <div class="chart-block">
         <h2>32 Direction Compass</h2>
-        <img src="{{ chart32_url }}" alt="32 Direction Compass" style="max-width:100%;">
+        <img src="{{ chart32_url }}" alt="32 Direction Compass">
     </div>
 
-    <div class="chart-block" style="margin-top: 20px;">
+    <div class="chart-block">
         <h2>16 Direction Compass</h2>
-       <img src="{{ chart16_url }}" alt="16 Direction Compass" style="max-width:100%;">
+        <img src="{{ chart16_url }}" alt="16 Direction Compass">
     </div>
+
+    {% if is_whitelabel and chart45_url %}
+    <div class="chart-block">
+        <h2>45 देवता</h2>
+        <img src="{{ chart45_url }}" alt="45 Devatas">
+    </div>
+    {% endif %}
 
 </div>
 

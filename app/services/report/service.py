@@ -43,6 +43,8 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
         )
 
         chart16 = "file://" + os.path.abspath(f"storage/projects/{project_id}/compass_16.png")
+        chart45_path = os.path.abspath(f"storage/projects/{project_id}/compass_45.png")
+        chart45 = "file://" + chart45_path if os.path.exists(chart45_path) else ""
         sp_logo_url = "file://" + os.path.abspath("storage/logo.jpg")
         return {
             "project": project,
@@ -58,6 +60,7 @@ def get_report_context(project_id: int, user_id: int, request_data: Dict[str, An
             "directions_lookup": direction_map,
             "chart32": chart32,
             "chart16": chart16,
+            "chart45": chart45,
             "request_data": request_data,
             "sp_logo_url": sp_logo_url
         }
