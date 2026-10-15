@@ -331,14 +331,21 @@ tr{
 }
 
 .compass-section .chart-block {
+    page-break-before: always;
+    break-before: page;
     page-break-inside: avoid;
     break-inside: avoid;
     margin: 0;
 }
 
-.compass-section .chart-block + .chart-block {
+.brahma-card {
     page-break-before: always;
     break-before: page;
+}
+
+.brahma-card p {
+    margin: 0 0 10px 0;
+    line-height: 1.45;
 }
 
 .compass-section .chart-block h2 {
@@ -876,31 +883,43 @@ tr{
 
 <div class="card compass-card">
 
-    <div class="card-title">
-        Floor Plan
-    </div>
-
     <div class="compass-section">
+
+    <div class="chart-block">
+        <div class="card-title">Floor Plan</div>
+        <h2>16 Direction Compass</h2>
+        <img src="{{ chart16_url }}" alt="16 Direction Compass">
+    </div>
 
     <div class="chart-block">
         <h2>32 Direction Compass</h2>
         <img src="{{ chart32_url }}" alt="32 Direction Compass">
     </div>
 
-    <div class="chart-block">
-        <h2>16 Direction Compass</h2>
-        <img src="{{ chart16_url }}" alt="16 Direction Compass">
-    </div>
-
     {% if is_whitelabel and chart45_url %}
     <div class="chart-block">
-        <h2>45 देवता</h2>
-        <img src="{{ chart45_url }}" alt="45 Devatas">
+        <h2>वास्तु पुरुष</h2>
+        <img src="{{ chart45_url }}" alt="Vastu Purush">
     </div>
     {% endif %}
 
 </div>
 
+</div>
+
+<div class="card brahma-card">
+    <div class="card-title">
+        ब्रह्म स्थान : {{ 'खुला' if brahma_sthan == 'open' else 'अवरुद्ध' }}
+    </div>
+    {% if brahma_sthan == 'open' %}
+    <p><strong>अर्थ:</strong> घर के मध्य में खुली, कम अवरोध वाली जगह।</p>
+    <p><strong>संभावित प्रभाव:</strong> खुलापन, प्रकाश और आवाजाही के लिए सुविधाजनक जगह; शांत वातावरण में सहायता हो सकती है।</p>
+    <p><strong>उपाय:</strong> मध्य भाग को स्वच्छ और अवरोध-मुक्त रखें; भारी फर्नीचर से बचें; प्राकृतिक प्रकाश और हवा बनाए रखें।</p>
+    {% else %}
+    <p><strong>अर्थ:</strong> घर के मध्य में दीवार, सीढ़ी, भारी निर्माण या भंडारण के कारण अवरुद्ध जगह।</p>
+    <p><strong>संभावित प्रभाव:</strong> कुछ वास्तु पद्धतियों में इसे घुटन या बेचैनी से जोड़ा जाता है। इससे विशिष्ट जीवन समस्याएँ होती हैं, इसका वैज्ञानिक प्रमाण नहीं है।</p>
+    <p><strong>उपाय:</strong> संभव हो तो अनावश्यक अवरोध कम करें; वस्तुओं की व्यवस्था बदलें; प्रकाश और हवा सुधारें; संरचनात्मक बदलाव से पहले वास्तु विशेषज्ञ की सलाह लें।</p>
+    {% endif %}
 </div>
 {% if is_whitelabel %}
 <!-- =====================================================

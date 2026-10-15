@@ -65,6 +65,7 @@ class ReportGenerateRequest(BaseModel):
     notes: Optional[str] = Field(None, max_length=1000)
     lang: Literal["en", "hi", "mr"] = "en"  # Add your supported languages
     reportType: Literal["pdf", "doc"] = "pdf"
+    brahmaSthan: Literal["open", "blocked"] = "open"
     
     @validator('cropPolygonPoints')
     def validate_crop_polygon(cls, v, values):

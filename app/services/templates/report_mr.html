@@ -331,14 +331,21 @@ tr{
 }
 
 .compass-section .chart-block {
+    page-break-before: always;
+    break-before: page;
     page-break-inside: avoid;
     break-inside: avoid;
     margin: 0;
 }
 
-.compass-section .chart-block + .chart-block {
+.brahma-card {
     page-break-before: always;
     break-before: page;
+}
+
+.brahma-card p {
+    margin: 0 0 10px 0;
+    line-height: 1.45;
 }
 
 .compass-section .chart-block h2 {
@@ -876,31 +883,43 @@ tr{
 
 <div class="card compass-card">
 
-    <div class="card-title">
-        Floor Plan
-    </div>
-
     <div class="compass-section">
+
+    <div class="chart-block">
+        <div class="card-title">Floor Plan</div>
+        <h2>16 Direction Compass</h2>
+        <img src="{{ chart16_url }}" alt="16 Direction Compass">
+    </div>
 
     <div class="chart-block">
         <h2>32 Direction Compass</h2>
         <img src="{{ chart32_url }}" alt="32 Direction Compass">
     </div>
 
-    <div class="chart-block">
-        <h2>16 Direction Compass</h2>
-        <img src="{{ chart16_url }}" alt="16 Direction Compass">
-    </div>
-
     {% if is_whitelabel and chart45_url %}
     <div class="chart-block">
-        <h2>45 देवता</h2>
-        <img src="{{ chart45_url }}" alt="45 Devatas">
+        <h2>वास्तु पुरुष</h2>
+        <img src="{{ chart45_url }}" alt="Vastu Purush">
     </div>
     {% endif %}
 
 </div>
 
+</div>
+
+<div class="card brahma-card">
+    <div class="card-title">
+        ब्रह्म स्थान : {{ 'मोकळे' if brahma_sthan == 'open' else 'अडथळा' }}
+    </div>
+    {% if brahma_sthan == 'open' %}
+    <p><strong>अर्थ:</strong> घराच्या मध्यभागी मोकळी, कमी अडथळ्यांची जागा</p>
+    <p><strong>संभाव्य परिणाम:</strong> मोकळेपणा, प्रकाश आणि हालचालीसाठी सोयीची जागा; शांत वातावरणास मदत होऊ शकते.</p>
+    <p><strong>उपाय:</strong> मध्यभाग स्वच्छ व अडथळामुक्त ठेवा; जड फर्निचर टाळा; नैसर्गिक प्रकाश व हवा ठेवा.</p>
+    {% else %}
+    <p><strong>अर्थ:</strong> घराच्या मध्यभागी भिंत, जिना, जड बांधकाम किंवा साठवणुकीमुळे अडथळे असलेली जागा</p>
+    <p><strong>संभाव्य परिणाम:</strong> काही वास्तु पद्धतींमध्ये याला कोंदटपणा किंवा अस्वस्थतेशी जोडले जाते; विशिष्ट जीवनसमस्या यामुळे होतात याचा वैज्ञानिक पुरावा नाही.</p>
+    <p><strong>उपाय:</strong> शक्य असल्यास अनावश्यक अडथळे कमी करा; वस्तूंची मांडणी बदला; प्रकाश व हवा सुधारा; संरचनात्मक बदलांपूर्वी वास्तुविशारदाचा सल्ला घ्या.</p>
+    {% endif %}
 </div>
 {% if is_whitelabel %}
 <!-- =====================================================

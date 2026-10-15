@@ -331,14 +331,21 @@ tr{
 }
 
 .compass-section .chart-block {
+    page-break-before: always;
+    break-before: page;
     page-break-inside: avoid;
     break-inside: avoid;
     margin: 0;
 }
 
-.compass-section .chart-block + .chart-block {
+.brahma-card {
     page-break-before: always;
     break-before: page;
+}
+
+.brahma-card p {
+    margin: 0 0 10px 0;
+    line-height: 1.45;
 }
 
 .compass-section .chart-block h2 {
@@ -876,31 +883,43 @@ tr{
 
 <div class="card compass-card">
 
-    <div class="card-title">
-        Floor Plan
-    </div>
-
     <div class="compass-section">
+
+    <div class="chart-block">
+        <div class="card-title">Floor Plan</div>
+        <h2>16 Direction Compass</h2>
+        <img src="{{ chart16_url }}" alt="16 Direction Compass">
+    </div>
 
     <div class="chart-block">
         <h2>32 Direction Compass</h2>
         <img src="{{ chart32_url }}" alt="32 Direction Compass">
     </div>
 
-    <div class="chart-block">
-        <h2>16 Direction Compass</h2>
-        <img src="{{ chart16_url }}" alt="16 Direction Compass">
-    </div>
-
     {% if is_whitelabel and chart45_url %}
     <div class="chart-block">
-        <h2>45 Devatas</h2>
-        <img src="{{ chart45_url }}" alt="45 Devatas">
+        <h2>Vastu Purush</h2>
+        <img src="{{ chart45_url }}" alt="Vastu Purush">
     </div>
     {% endif %}
 
 </div>
 
+</div>
+
+<div class="card brahma-card">
+    <div class="card-title">
+        Brahma Sthan : {{ 'Open' if brahma_sthan == 'open' else 'Blocked' }}
+    </div>
+    {% if brahma_sthan == 'open' %}
+    <p><strong>Meaning:</strong> An open space in the centre of the house, with few obstructions.</p>
+    <p><strong>Possible Effects:</strong> An open area that is convenient for light and movement; it can help create a calm atmosphere.</p>
+    <p><strong>Remedies:</strong> Keep the centre clean and free of obstructions; avoid heavy furniture; keep natural light and air.</p>
+    {% else %}
+    <p><strong>Meaning:</strong> A space in the centre of the house obstructed by a wall, staircase, heavy construction, or storage.</p>
+    <p><strong>Possible Effects:</strong> Some Vastu methods associate this with stuffiness or unease. There is no scientific evidence that it causes specific problems in life.</p>
+    <p><strong>Remedies:</strong> Where possible, reduce unnecessary obstructions; rearrange objects; improve light and air; consult a Vastu consultant before structural changes.</p>
+    {% endif %}
 </div>
 {% if is_whitelabel %}
 <!-- =====================================================

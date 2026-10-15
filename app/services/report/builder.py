@@ -18,6 +18,9 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
     chart16 = context.get("chart16")
     chart45 = context.get("chart45") or ""
     request_data = context.get("request_data", {})
+    brahma_sthan = str(request_data.get("brahmaSthan") or "open").lower()
+    if brahma_sthan not in ("open", "blocked"):
+        brahma_sthan = "open"
     sp_logo_url = context.get("sp_logo_url", "")
     lang =  context.get("lang", "en")
 
@@ -113,6 +116,7 @@ def build_payload(context: Dict[str, Any]) -> Dict[str, Any]:
         "chart32_url": chart32,
         "chart16_url": chart16,
         "chart45_url": chart45,
+        "brahma_sthan": brahma_sthan,
         "lang":lang,
 
         # ================= FOOTER =================
