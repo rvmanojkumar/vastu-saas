@@ -116,10 +116,12 @@ def _valid_mobile(phone: str) -> bool:
 
 
 def _assert_otp_matches_phone(db: Session, id_token: str, phone: str) -> None:
-    from app.services.firebase_auth import token_matches_phone
+    from app.services.firebase_auth import FirebaseAuthError, token_matches_phone
 
     try:
         ok = token_matches_phone(db, id_token, phone)
+    except FirebaseAuthError as exc:
+        raise HTTPException(400, str(exc))
     except Exception:
         raise HTTPException(400, "Invalid or expired OTP. Please request a new OTP.")
     if not ok:
@@ -211,10 +213,12 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
 @router.post("/reset-password")
 def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
     """Reset password after Firebase phone OTP verification."""
-    from app.services.firebase_auth import phones_match, verify_id_token
+    from app.services.firebase_auth import FirebaseAuthError, phones_match, verify_id_token
 
     try:
         decoded = verify_id_token(db, body.firebase_id_token)
+    except FirebaseAuthError as exc:
+        raise HTTPException(400, str(exc))
     except Exception:
         raise HTTPException(400, "Invalid or expired OTP session. Please request a new OTP.")
 

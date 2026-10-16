@@ -31,16 +31,31 @@ def phones_match(stored: Optional[str], firebase_phone: Optional[str]) -> bool:
     return normalize_phone(stored) == normalize_phone(firebase_phone)
 
 
+class FirebaseAuthError(Exception):
+    pass
+
+
 def _load_app(db: Session):
     raw = get_raw(db, "firebase_service_account_json")
     if not raw:
-        raise RuntimeError("Firebase service account is not configured")
-    info = json.loads(raw)
+        raise FirebaseAuthError(
+            "Firebase service account is not saved. In Admin → Settings, paste the service account JSON, save, and restart the API."
+        )
+    try:
+        info = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise FirebaseAuthError(
+            "Firebase service account JSON is invalid. Paste the file from Firebase → Project settings → Service accounts."
+        ) from exc
     cred = credentials.Certificate(info)
     try:
-        return firebase_admin.get_app(_APP_NAME)
+        app = firebase_admin.get_app(_APP_NAME)
     except ValueError:
         return firebase_admin.initialize_app(cred, name=_APP_NAME)
+    if app.project_id != info.get("project_id"):
+        firebase_admin.delete_app(app)
+        return firebase_admin.initialize_app(cred, name=_APP_NAME)
+    return app
 
 
 def firebase_verification_required(db: Session) -> bool:
@@ -52,9 +67,18 @@ def firebase_verification_required(db: Session) -> bool:
 
 def verify_id_token(db: Session, id_token: str) -> dict:
     if not id_token:
-        raise ValueError("Missing Firebase ID token")
+        raise FirebaseAuthError("Missing Firebase ID token")
     app = _load_app(db)
-    return auth.verify_id_token(id_token, app=app)
+    try:
+        # A brand-new phone token is often a few seconds ahead of the server clock.
+        return auth.verify_id_token(id_token, app=app, clock_skew_seconds=60)
+    except FirebaseAuthError:
+        raise
+    except Exception as exc:
+        logger.exception("Firebase ID token verification failed")
+        raise FirebaseAuthError(
+            "Invalid or expired OTP session. Please request a new OTP."
+        ) from exc
 
 
 def phone_from_id_token(db: Session, id_token: str) -> str:
